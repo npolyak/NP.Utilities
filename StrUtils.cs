@@ -18,11 +18,11 @@ using System.Threading.Tasks;
 
 namespace NP.Utilities
 {
-    class SeparatorInfo
+    public class SeparatorInfo
     {
-        internal PropertyKind ThePropertyKind { get; private set; }
-        internal string BeginSeparator { get; private set; }
-        internal string EndSepartor { get; private set; }
+        public PropertyKind ThePropertyKind { get; private set; }
+        public string BeginSeparator { get; private set; }
+        public string EndSepartor { get; private set; }
 
         public SeparatorInfo (PropertyKind propKind, string beginSeparator, string endSeparator)
 	    {
@@ -62,7 +62,7 @@ namespace NP.Utilities
             return result;
         }
 
-        static SeparatorInfo SeparatorInfoByBeginSeparator(string str)
+        public static SeparatorInfo SeparatorInfoByBeginSeparator(string str)
         {
             if (str == null)
                 return null;
