@@ -41,6 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviors\BehaviorsDisposable.cs" />
+    <Compile Include="Behaviors\DisposableBehaviorContainer.cs" />
+    <Compile Include="Behaviors\DoForEachItemCollectionBehavior.cs" />
+    <Compile Include="Behaviors\ForEachItemCollectionBehaviorBase.cs" />
+    <Compile Include="Behaviors\ForEachItemEventCollectionBehavior.cs" />
+    <Compile Include="Behaviors\InsertBehavior.cs" />
+    <Compile Include="Behaviors\IStatelessBehavior.cs" />
     <Compile Include="ClassMemberType.cs" />
     <Compile Include="CodeBuilder.cs" />
     <Compile Include="CodeUtils.cs" />
@@ -50,9 +57,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyKind.cs" />
     <Compile Include="ReflectionUtils.cs" />
+    <Compile Include="Behaviors\SelectableItem.cs" />
+    <Compile Include="Behaviors\SingleSelectionObservableCollection.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="StrUtils.cs" />
     <Compile Include="TypeUtils.cs" />
+    <Compile Include="VMBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
