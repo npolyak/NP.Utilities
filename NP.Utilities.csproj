@@ -47,7 +47,10 @@
     <Compile Include="Behaviors\ForEachItemCollectionBehaviorBase.cs" />
     <Compile Include="Behaviors\ForEachItemEventCollectionBehavior.cs" />
     <Compile Include="Behaviors\InsertBehavior.cs" />
+    <Compile Include="Behaviors\IRemovable.cs" />
     <Compile Include="Behaviors\IStatelessBehavior.cs" />
+    <Compile Include="Behaviors\Removable.cs" />
+    <Compile Include="Behaviors\RemovableCollectionBehavior.cs" />
     <Compile Include="ClassMemberType.cs" />
     <Compile Include="CodeBuilder.cs" />
     <Compile Include="CodeUtils.cs" />
