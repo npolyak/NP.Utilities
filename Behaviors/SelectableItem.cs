@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NP.Utilities.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,7 +14,10 @@ namespace NP.Utilities.Behaviors
     {
         bool IsSelected { get; set; }
 
+        [EventThisIdx]
         event Action<ISelectableItem<T>> IsSelectedChanged;
+
+        void SelectItem();
     }
 
     public class SelectableItem<T> : VMBase, ISelectableItem<T>, INotifyPropertyChanged

@@ -9,6 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.Utilities.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

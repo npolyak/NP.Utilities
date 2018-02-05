@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\EventThisIdxAttribute.cs" />
     <Compile Include="Behaviors\BehaviorsDisposable.cs" />
     <Compile Include="Behaviors\DisposableBehaviorContainer.cs" />
     <Compile Include="Behaviors\DoForEachItemCollectionBehavior.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="Behaviors\InsertBehavior.cs" />
     <Compile Include="Behaviors\IRemovable.cs" />
     <Compile Include="Behaviors\IStatelessBehavior.cs" />
+    <Compile Include="Behaviors\ParentChildSelectionBehavior.cs" />
     <Compile Include="Behaviors\Removable.cs" />
     <Compile Include="Behaviors\RemovableCollectionBehavior.cs" />
     <Compile Include="ClassMemberType.cs" />
