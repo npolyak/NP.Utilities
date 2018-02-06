@@ -59,6 +59,7 @@ namespace NP.Utilities.Behaviors
             }
         }
 
+        // unselect children if parent is unselected
         private void ParentChildSelectionBehavior_IsSelectedChanged(ISelectableItem<TParent> parent)
         {
             if (!parent.IsSelected)
@@ -73,6 +74,7 @@ namespace NP.Utilities.Behaviors
             }
         }
 
+        // select the parent if its child is selected. 
         private void Child_IsSelectedChanged(ISelectableItem<TChild> child)
         {
             if ((child.IsSelected) && (this.Parent != null))
