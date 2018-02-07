@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace NP.Utilities.Behaviors
 {
+    // used to dispose of behaviors
     public class BehaviorsDisposable<T> : IDisposable
     {
         List<DisposableBehaviorContainer<T>> _disposableBehaviors = new List<DisposableBehaviorContainer<T>>();
