@@ -57,6 +57,9 @@
     <Compile Include="CodeBuilder.cs" />
     <Compile Include="CodeUtils.cs" />
     <Compile Include="CollectionUtils.cs" />
+    <Compile Include="Expressions\ExprStringBuilder.cs" />
+    <Compile Include="Expressions\ReplaceFirstArgExprStringBuilder.cs" />
+    <Compile Include="ExpressionUtils.cs" />
     <Compile Include="IValConverter.cs" />
     <Compile Include="ObjUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
