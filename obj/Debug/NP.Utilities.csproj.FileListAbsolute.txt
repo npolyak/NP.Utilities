@@ -1,0 +1,6 @@
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\bin\Debug\NP.Utilities.dll
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\bin\Debug\NP.Utilities.pdb
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\obj\Debug\NP.Utilities.csproj.CoreCompileInputs.cache
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\obj\Debug\NP.Utilities.dll
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\obj\Debug\NP.Utilities.pdb
+C:\IDEAS\GITHUB\NP.Roxy\NP.Utilities\obj\Debug\NP.Utilities.csprojResolveAssemblyReference.cache
