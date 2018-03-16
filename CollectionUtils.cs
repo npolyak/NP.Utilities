@@ -302,6 +302,22 @@ namespace NP.Utilities
             collection.Add(elementToAdd);
         }
 
+        public static void AddRangeIfNotThere<T>
+        (
+            this IList<T> collection,
+            IEnumerable<T> elementsToAdd,
+            Func<T, T, bool> predicate = null
+        )
+        {
+            if (predicate == null)
+                predicate = (el, elToAdd) => el.ObjEquals(elToAdd);
+
+            foreach(T elementToAdd in elementsToAdd )
+            {
+                AddIfNotThere(collection, elementToAdd, predicate);
+            }
+        }
+
 
         public static bool IsInValCollection<T>(this T obj, IEnumerable<object> valueCollection)
         {

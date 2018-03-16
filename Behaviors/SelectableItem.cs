@@ -9,7 +9,6 @@ using System.Xml.Serialization;
 
 namespace NP.Utilities.Behaviors
 {
-    [DefaultImpl(typeof(SelectableItem<>))]
     public interface ISelectableItem<T>
         where T : ISelectableItem<T>
     {
@@ -21,7 +20,7 @@ namespace NP.Utilities.Behaviors
         void SelectItem();
     }
 
-    [DefaultWrapper(typeof(SelectableItemWrapper<>))]
+    [Implements(typeof(ISelectableItem<>))]
     public class SelectableItem<T> : VMBase, ISelectableItem<T>, INotifyPropertyChanged
         where T : ISelectableItem<T>
     {
@@ -61,9 +60,10 @@ namespace NP.Utilities.Behaviors
         }
     }
 
-    public class SelectableItemWrapper<T>
+    [WrapperInterface(typeof(ISelectableItem<>))]
+    public interface ISelectableItemWrapper<T>
         where T : ISelectableItem<T>
     {
-        public SelectableItem<T> TheSelectableItem { get; }
+        SelectableItem<T> TheSelectableItem { get; }
     }
 }

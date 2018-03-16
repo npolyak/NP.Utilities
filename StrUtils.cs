@@ -72,6 +72,14 @@ namespace NP.Utilities
             return result;
         }
 
+        public static string NullToEmpty(this string str)
+        {
+            if (str == null)
+                return string.Empty;
+
+            return str;
+        }
+
         public static bool StartsWith(this string str, IEnumerable<char> charsToFind, int idx = 0)
         {
             if (charsToFind == null)

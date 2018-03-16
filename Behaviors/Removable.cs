@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 
 namespace NP.Utilities.Behaviors
 {
+   
+    [Implements(typeof(IRemovable))]
     public class Removable : IRemovable
     {
         public event Action<IRemovable> RemoveEvent;
@@ -26,5 +28,12 @@ namespace NP.Utilities.Behaviors
         {
             RemoveEvent?.Invoke(this);
         }
+    }
+
+
+    [WrapperInterface(typeof(IRemovable))]
+    public interface IRemovableWrapper
+    {
+        Removable TheRemovable { get; }
     }
 }

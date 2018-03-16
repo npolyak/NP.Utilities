@@ -41,8 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\DefaultImplAttribute.cs" />
-    <Compile Include="Attributes\DefaultWrapperAttribute.cs" />
+    <Compile Include="Attributes\ImplementsAttribute.cs" />
+    <Compile Include="Attributes\WrapperInterfaceAttribute.cs" />
     <Compile Include="Attributes\EventThisIdxAttribute.cs" />
     <Compile Include="Behaviors\BehaviorsDisposable.cs" />
     <Compile Include="Behaviors\DisposableBehaviorContainer.cs" />

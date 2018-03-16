@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace NP.Utilities.Attributes
 {
-    [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class DefaultImplAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class ImplementsAttribute : Attribute
     {
         public Type ImplType { get; }
 
-        public DefaultImplAttribute(Type implType)
+        public ImplementsAttribute(Type implType)
         {
             this.ImplType = implType;
         }
