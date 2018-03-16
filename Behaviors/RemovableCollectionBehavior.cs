@@ -9,6 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.Utilities.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,6 +25,9 @@ namespace NP.Utilities.Behaviors
         IDisposable _behaviorDisposable = null;
 
         IEnumerable<IRemovable> _collection;
+
+        // ExternalToClass means that it is not produced by the class
+        [ExternalToClass]
         public IEnumerable<IRemovable> TheCollection
         {
             get => _collection;
