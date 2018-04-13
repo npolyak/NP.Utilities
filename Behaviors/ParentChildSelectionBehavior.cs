@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NP.Utilities.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace NP.Utilities.Behaviors
         IDisposable _childrenBehaviorDisposable = null;
 
         TParent _parent;
+        [In]
         public TParent Parent
         {
             get => _parent;
@@ -40,6 +42,7 @@ namespace NP.Utilities.Behaviors
         }
 
         ObservableCollection<TChild> _children;
+        [In]
         public ObservableCollection<TChild> Children
         {
             private get => _children;

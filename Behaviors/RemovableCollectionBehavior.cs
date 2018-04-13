@@ -26,8 +26,7 @@ namespace NP.Utilities.Behaviors
 
         IEnumerable<IRemovable> _collection;
 
-        // ExternalToClass means that it is not produced by the class
-        [ExternalToClass]
+        [In]
         public IEnumerable<IRemovable> TheCollection
         {
             get => _collection;
