@@ -12,26 +12,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NP.Utilities
 {
-    public class SeparatorInfo
-    {
-        public PropertyKind ThePropertyKind { get; private set; }
-        public string BeginSeparator { get; private set; }
-        public string EndSepartor { get; private set; }
-
-        public SeparatorInfo (PropertyKind propKind, string beginSeparator, string endSeparator)
-	    {
-            ThePropertyKind = propKind;
-            BeginSeparator = beginSeparator;
-            EndSepartor = endSeparator;
-	    }
-    }
-
     public static class StrUtils
     {
         public const string UNDERSCORE = "_";
@@ -39,38 +22,6 @@ namespace NP.Utilities
 
         public const string COMMA_SEPARATOR = ", ";
         public const string PLAIN_PATH_LINK_SEPARATOR = ".";
-        public const string ATTACHED_PATH_LINK_SEPARATPOR_BEGIN = "(";
-        public const string ATTACHED_PATH_LINK_SEPARATPOR_END = ")";
-        public const string APROP_PATH_LINK_SEPARATPOR_BEGIN = "*";
-        public const string APROP_PATH_LINK_SEPARATPOR_END = "*";
-        public const string MAP_PROP_PATH_LINK_SEPARATOR_BEGIN = "-";
-        public const string MAP_PROP_PATH_LINK_SEPARATOR_END = "-";
-
-                
-        static readonly SeparatorInfo[] Separators = 
-            new SeparatorInfo[]
-            {
-                new SeparatorInfo(PropertyKind.Attached, ATTACHED_PATH_LINK_SEPARATPOR_BEGIN, ATTACHED_PATH_LINK_SEPARATPOR_END),
-                new SeparatorInfo(PropertyKind.AProperty, APROP_PATH_LINK_SEPARATPOR_BEGIN, APROP_PATH_LINK_SEPARATPOR_END),
-                new SeparatorInfo(PropertyKind.Map, MAP_PROP_PATH_LINK_SEPARATOR_BEGIN, MAP_PROP_PATH_LINK_SEPARATOR_END)
-            };
-
-        static SeparatorInfo SeparatorInfoByPropertyKind(this PropertyKind propertyKind)
-        {
-            SeparatorInfo result = Separators.Where((sepInfo) => sepInfo.ThePropertyKind == propertyKind).FirstOrDefault();
-
-            return result;
-        }
-
-        public static SeparatorInfo SeparatorInfoByBeginSeparator(string str)
-        {
-            if (str == null)
-                return null;
-
-            SeparatorInfo result = Separators.Where( (sepInfo) => str.StartsWith(sepInfo.BeginSeparator) ).FirstOrDefault();
-
-            return result;
-        }
 
         public static string NullToEmpty(this string str)
         {
@@ -95,18 +46,6 @@ namespace NP.Utilities
             }
 
             return true;
-        }
-
-        public static string Wrap(this PropertyKind propertyKind,  string stringToWrap)
-        {
-            SeparatorInfo separatorInfo = propertyKind.SeparatorInfoByPropertyKind();
-
-            if (separatorInfo == null)
-                return stringToWrap;
-
-            string result = separatorInfo.BeginSeparator + stringToWrap + separatorInfo.EndSepartor;
-
-            return result;
         }
 
         public static string SubstrFromTo

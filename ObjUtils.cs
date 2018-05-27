@@ -10,11 +10,7 @@
 // products that use it.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace NP.Utilities
 {

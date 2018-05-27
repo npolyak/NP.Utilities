@@ -84,22 +84,6 @@ namespace NP.Utilities
             return result;
         }
 
-        public static ClassMemberType GetClassMemberType(this Type type, string memberName)
-        {
-            MemberInfo memberInfo = type.GetSingleMemberInfo(memberName);
-
-            if (memberInfo is PropertyInfo)
-                return ClassMemberType.Property;
-
-            if (memberInfo is MethodInfo)
-                return ClassMemberType.Method;
-
-            if (memberInfo is EventInfo)
-                return ClassMemberType.Event;
-
-            return ClassMemberType.None;
-        }
-
         static BindingFlags GetBindingFlags(bool includeNonPublic, bool isStatic)
         {
             BindingFlags bindingFlags =
@@ -257,34 +241,6 @@ namespace NP.Utilities
             return val;
         }
 
-        public static void CopyProp
-        (
-            this object sourceObj,
-            string sourcePropName,
-            object targetObj,
-            string targetPropName = null,
-            IValConverter converter = null
-        )
-        {
-            object sourcePropValue = sourceObj;
-
-            if (sourcePropName != null)
-            {
-                sourcePropValue = GetPropValue(sourceObj, sourcePropName);
-            }
-
-            object targetPropValue = sourcePropValue;
-
-            if (converter != null)
-            {
-                targetPropValue = converter.Convert(sourcePropValue);
-            }
-
-            if (targetPropName == null)
-                targetPropName = sourcePropName;
-
-            ReflectionUtils.SetPropValue(targetObj, targetPropName, targetPropValue);
-        }
 
         public static ConstructorInfo GetDefaultConstructor(this Type type)
         {
@@ -356,10 +312,19 @@ namespace NP.Utilities
             return result;
         }
 
+        public static bool HasGetter(this PropertyInfo propInfo)
+        {
+            return propInfo.GetGetMethod() != null;
+        }
+
+        public static bool HasSetter(this PropertyInfo propInfo)
+        {
+            return propInfo.GetSetMethod() != null;
+        }
+
         public static bool HasGetterAndSetter(this PropertyInfo propInfo)
         {
-            return (propInfo.GetGetMethod() != null) &&
-                           (propInfo.GetSetMethod() != null);
+            return propInfo.HasGetter() && propInfo.HasSetter();
         }
 
 
@@ -392,5 +357,23 @@ namespace NP.Utilities
 
             propInfo.SetValue(null, valueToSet);
         }
+
+        public static IEnumerable<T> GetMemberAttrs<T>(this MemberInfo memberInfo)
+            where T : Attribute
+        {
+            return memberInfo.GetCustomAttributes<T>();
+        }
+
+        public static TAttr GetMemberAttr<TAttr>(this MemberInfo memberInfo)
+            where TAttr : Attribute
+        {
+            return memberInfo.GetCustomAttributes<TAttr>().FirstOrDefault();
+        }
+
+        public static bool ContainsAttr<TAttr>(this MemberInfo memberInfo)
+            where TAttr : Attribute
+        {
+            return memberInfo.GetMemberAttr<TAttr>() != null;
+        }                      
     }
 }
