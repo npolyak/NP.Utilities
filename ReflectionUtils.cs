@@ -342,6 +342,11 @@ namespace NP.Utilities
             return obj.GetType().GetTypePropsWithGetterAndSetter();
         }
 
+        public static string GetFullGenericTypeName(this Type type)
+        {
+            return type.FullName.SubstrFromTo(null, "[");
+        }
+
         public static string GetFullTypeStr(this Type type)
         {
             return type.Namespace + "." + type.Name;
