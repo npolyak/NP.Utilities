@@ -16,6 +16,7 @@ using System.Reflection;
 
 namespace NP.Utilities
 {
+    using System.IO;
     using static NP.Utilities.StrUtils;
 
     public static class ReflectionUtils
@@ -374,6 +375,26 @@ namespace NP.Utilities
             where TAttr : Attribute
         {
             return memberInfo.GetMemberAttr<TAttr>() != null;
-        }                      
+        }
+
+        public static Type GetBaseTypeOrFirstInterface(this Type type)
+        {
+            Type result = type.BaseType;
+
+            if (result == typeof(object))
+            {
+                result = type.GetInterfaces().FirstOrDefault();
+            }
+
+            return result;
+        }
+
+        public static string GetCurrentExecutablePath()
+        {
+            string currentExecutablePath =
+                Assembly.GetEntryAssembly().Location;
+
+            return Path.GetDirectoryName(currentExecutablePath);
+        }
     }
 }

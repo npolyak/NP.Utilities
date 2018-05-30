@@ -41,6 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ImplementsAttribute.cs" />
+    <Compile Include="Attributes\MultiImplementsAttribute.cs" />
+    <Compile Include="Attributes\MultiPart.cs" />
+    <Compile Include="Attributes\PartAttribute.cs" />
     <Compile Include="CollectionUtils.cs" />
     <Compile Include="ExpressionUtils.cs" />
     <Compile Include="ObjUtils.cs" />
