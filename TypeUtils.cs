@@ -26,6 +26,16 @@ namespace NP.Utilities
             return type.Name.SubstrFromTo(null, "`");
         }
 
+        public static string NestedTypeToName(this Type type)
+        {
+            string currentTypeName = type.GetTypeName();
+
+            if (!type.IsNested)
+                return currentTypeName;
+
+            return type.DeclaringType.NestedTypeToName() + "_" + currentTypeName;
+        }
+
         public static string Box(this string typeStr)
         {
             switch (typeStr)
