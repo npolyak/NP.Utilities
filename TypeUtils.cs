@@ -18,12 +18,19 @@ using System.Reflection;
 namespace NP.Utilities
 {
     public static class TypeUtils
-    {
+    {        
+        // removes the 'apostrophy' and the number 
+        // of generic args for a generic type
+        public static string GetTypeName(string typeName)
+        {
+            return typeName.SubstrFromTo(null, "`");
+        }
+
         // removes the 'apostrophy' and the number 
         // of generic args for a generic type
         public static string GetTypeName(this Type type)
         {
-            return type.Name.SubstrFromTo(null, "`");
+            return GetTypeName(type.Name);
         }
 
         public static string NestedTypeToName(this Type type)
