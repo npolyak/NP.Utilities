@@ -66,7 +66,14 @@ namespace NP.Utilities
             {
                 startIdx = firstOrLast ? str.IndexOf(start) : str.LastIndexOf(start);
 
-                startIdx += start.Length;
+                if (startIdx < 0)
+                {
+                    startIdx = 0;
+                }
+                else
+                {
+                    startIdx += start.Length;
+                }
             }
 
             if (!string.IsNullOrEmpty(end))
