@@ -52,6 +52,8 @@
     <Compile Include="ReflectionUtils.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="StrUtils.cs" />
+    <Compile Include="TreeNodeInfo.cs" />
+    <Compile Include="TreeUtils.cs" />
     <Compile Include="TypeUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
