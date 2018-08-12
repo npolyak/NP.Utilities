@@ -47,14 +47,18 @@
     <Compile Include="Attributes\PartAttribute.cs" />
     <Compile Include="CollectionUtils.cs" />
     <Compile Include="ExpressionUtils.cs" />
+    <Compile Include="MathUtils.cs" />
     <Compile Include="ObjUtils.cs" />
+    <Compile Include="Point2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rect2D.cs" />
     <Compile Include="ReflectionUtils.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="StrUtils.cs" />
     <Compile Include="TreeNodeInfo.cs" />
     <Compile Include="TreeUtils.cs" />
     <Compile Include="TypeUtils.cs" />
+    <Compile Include="UniqueNameGenerator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
