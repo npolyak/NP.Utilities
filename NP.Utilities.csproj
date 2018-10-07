@@ -46,6 +46,7 @@
     <Compile Include="Attributes\MultiPart.cs" />
     <Compile Include="Attributes\PartAttribute.cs" />
     <Compile Include="CollectionUtils.cs" />
+    <Compile Include="DoubleParamMap.cs" />
     <Compile Include="ExpressionUtils.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="ObjUtils.cs" />
