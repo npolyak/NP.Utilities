@@ -12,6 +12,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace NP.Utilities
 {
@@ -21,7 +24,8 @@ namespace NP.Utilities
         public const string PERIOD = ".";
 
         public const string COMMA_SEPARATOR = ", ";
-        public const string PLAIN_PATH_LINK_SEPARATOR = ".";
+        public const string PLAIN_PROP_PATH_LINK_SEPARATOR = ".";
+        public const char BINDING_PATH_LINK_SEPARATOR = '/';
 
         public static string NullToEmpty(this string str)
         {
@@ -158,6 +162,26 @@ namespace NP.Utilities
             }
 
             return (strToBreak.Substring(0, idx), strToBreak.Substring(idx + separator.Length));
+        }
+
+
+        public static IEnumerable<string> SplitPath(this string path, char separator = '/')
+        {
+            return 
+                path?.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries) ?? 
+                      Enumerable.Empty<string>();
+        }
+
+        public static string StreamToString(this MemoryStream stream)
+        {
+            return Encoding.ASCII.GetString(stream.ToArray());
+        }
+
+        public static string StreamWriterToString(this TextWriter streamWriter)
+        {
+            streamWriter.Flush();
+
+            return (((StreamWriter)streamWriter).BaseStream as MemoryStream).StreamToString();
         }
     }
 }

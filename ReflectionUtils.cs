@@ -181,7 +181,7 @@ namespace NP.Utilities
             where T : class
         {
             (string firstLink, string remainder) =
-                compoundPropName.BreakStrAtSeparator(PLAIN_PATH_LINK_SEPARATOR);
+                compoundPropName.BreakStrAtSeparator(PLAIN_PROP_PATH_LINK_SEPARATOR);
 
             object nextObj = obj.GetPropValue<T>(firstLink);
 
@@ -196,7 +196,7 @@ namespace NP.Utilities
             object nextObj = obj;
 
             (string firstLink, string remainder) =
-                compoundPropName.BreakStrAtSeparator(PLAIN_PATH_LINK_SEPARATOR);
+                compoundPropName.BreakStrAtSeparator(PLAIN_PROP_PATH_LINK_SEPARATOR);
 
             if (remainder == null)
             {

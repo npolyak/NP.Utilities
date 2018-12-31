@@ -398,5 +398,15 @@ namespace NP.Utilities
 
             items.DoForEach(item => list.InsertInOrder(item, comparisonFn));
         }
+
+        public static void DeleteAllOneByOne(this IList list)
+        {
+            ArrayList arrayList = new ArrayList(list);
+
+            foreach(var item in arrayList)
+            {
+                list.Remove(item);
+            }
+        }
     }
 }

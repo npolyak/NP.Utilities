@@ -11,7 +11,9 @@
 
 using NP.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -294,6 +296,132 @@ namespace NP.Utilities
                     Where((topLevelChild) => (!object.ReferenceEquals(topLevelChild, topLevelChildAncestor)));
 
             return topLevelChildrenWithoutChildAncestor.CollectionDescendants(toChildrenFunction, 1);
+        }
+
+        private static void PrintStr(
+            this string str,
+            int depth,
+            TextWriter outputStream)
+        {
+            if (str.IsNullOrEmpty())
+                return;
+
+            str = new string(' ', 4 * depth) + str;
+
+            outputStream.Write(str);
+        }
+
+        public static void PrintNodeAndDescendants<NodeType>
+        (
+            this NodeType node,
+            Func<NodeType, IEnumerable> toChildObjectsFn,
+            string prefix = null,
+            Func<object, NodeType> childObjToChildFn = null,
+            Func<object, string> childObjToStringPrefixFn = null,
+            Func<NodeType, string> nodeToStringFn = null,
+            TextWriter outputStream = null,
+            Func<NodeType, (string, string)> startEndCollectionMarkerConverter = null,
+            Func<NodeType, string> separatorConverter = null,
+            int depth = 0
+        )
+            where NodeType : class
+        {
+            if (nodeToStringFn == null)
+                nodeToStringFn = (nd) => nd.ToStr();
+
+            if (outputStream == null)
+            {
+                outputStream = Console.Out;
+            }
+
+            string currentNodeStr = "";
+
+            if (!prefix.IsNullOrEmpty())
+            {
+                currentNodeStr += prefix;
+            }
+
+            string nodeStrToPrint = nodeToStringFn(node);
+
+            if (!nodeStrToPrint.IsNullOrEmpty())
+            {
+                currentNodeStr += nodeStrToPrint;
+            }
+
+            currentNodeStr.PrintStr(depth, outputStream);
+
+            var childEnum = toChildObjectsFn(node);
+
+            if (childEnum.IsNullOrEmpty())
+                return;
+
+            if (childObjToChildFn == null)
+            {
+                childObjToChildFn = (obj) => (NodeType)obj;
+            }
+
+            (string startCollectionMarker, string endCollectionMarker, string separator) = 
+                (string.Empty, string.Empty, string.Empty);
+
+            if (startEndCollectionMarkerConverter != null)
+            {
+                (startCollectionMarker, endCollectionMarker) =
+                    startEndCollectionMarkerConverter(node);
+            }
+
+            if (separatorConverter != null)
+            {
+                separator = separatorConverter(node);
+            }
+
+            if (!startCollectionMarker.IsNullOrEmpty())
+            {
+                outputStream.WriteLine();
+                startCollectionMarker.PrintStr(depth, outputStream);
+            }
+
+            int childDepth = depth + 1;
+
+            bool firstIteration = true;
+            foreach (var childNodeObj in childEnum)
+            {
+                if (firstIteration)
+                {
+                    firstIteration = false;
+                }
+                else
+                {
+                    outputStream.Write(separator);
+                }
+
+                string childPrefix = null;
+
+                if (childObjToStringPrefixFn != null)
+                {
+                    childPrefix = childObjToStringPrefixFn(childNodeObj);
+                }
+
+                NodeType childNode = childObjToChildFn(childNodeObj);
+
+                outputStream.WriteLine();
+                childNode.PrintNodeAndDescendants
+                (
+                    toChildObjectsFn,
+                    childPrefix,
+                    childObjToChildFn,
+                    childObjToStringPrefixFn,
+                    nodeToStringFn, 
+                    outputStream,
+                    startEndCollectionMarkerConverter,
+                    separatorConverter,
+                    childDepth);
+            }
+
+            if (!endCollectionMarker.IsNullOrEmpty())
+            {
+                outputStream.WriteLine();
+                endCollectionMarker.PrintStr(depth, outputStream);
+            }
         }
     }
 }
