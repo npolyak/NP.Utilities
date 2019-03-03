@@ -48,12 +48,17 @@
     <Compile Include="CollectionUtils.cs" />
     <Compile Include="DoubleParamMap.cs" />
     <Compile Include="ExpressionUtils.cs" />
+    <Compile Include="FolderUtils\AppFolder.cs" />
+    <Compile Include="FolderUtils\FolderSaverRestorer.cs" />
+    <Compile Include="FolderUtils\IOUtils.cs" />
+    <Compile Include="FolderUtils\SaveableRestorableContainer.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="ObjUtils.cs" />
     <Compile Include="Point2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rect2D.cs" />
     <Compile Include="ReflectionUtils.cs" />
+    <Compile Include="FolderUtils\SpecialFolderUtils.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="StrUtils.cs" />
     <Compile Include="TreeNodeInfo.cs" />

@@ -105,10 +105,23 @@ namespace NP.Utilities
             return bindingFlags;
         }
 
+        public static FieldInfo GetFieldInfoFromType
+        (
+            this Type type,
+            string fieldName,
+            bool includeNonPublic = true)
+        {
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
+
+            FieldInfo fieldInfo = type.GetField(fieldName, bindingFlags);
+
+            return fieldInfo;
+        }
+
         public static PropertyInfo GetPropInfoFromType
         (
-            this Type type, 
-            string propName, 
+            this Type type,
+            string propName,
             bool includeNonPublic = false)
         {
             BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
@@ -117,6 +130,21 @@ namespace NP.Utilities
 
             return sourcePropInfo;
         }
+
+
+        public static FieldInfo GetFieldInfo
+        (
+            this object obj,
+            string fieldName,
+            bool includeNonPublic = true, 
+            Type realType = null)
+        {
+            if (realType == null)
+                realType = obj.GetType();
+
+            return realType.GetFieldInfoFromType(fieldName, includeNonPublic);
+        }
+
 
         public static PropertyInfo GetPropInfo
         (
@@ -127,6 +155,18 @@ namespace NP.Utilities
             PropertyInfo sourcePropInfo = obj.GetType().GetPropInfoFromType(propName, includeNonPublic);
 
             return sourcePropInfo;
+        }
+
+        public static T GetFieldValue<T>
+        (
+            this object obj,
+            string fieldName,
+            bool includeNonPublic = true,
+            Type realType = null)
+        {
+            FieldInfo fieldInfo = obj.GetFieldInfo(fieldName, includeNonPublic, realType);
+
+            return (T) fieldInfo.GetValue(obj);
         }
 
         public static object GetPropValue
@@ -140,9 +180,26 @@ namespace NP.Utilities
             return propInfo.GetValue(obj, null);
         }
 
-        public static T GetPropValue<T>(this object obj, string propName)
+        public static T GetPropValue<T>
+        (
+            this object obj, 
+            string propName,
+            bool includeNonPublic = false)
         {
-            return (T)obj.GetPropValue(propName);
+            return (T)obj.GetPropValue(propName, includeNonPublic);
+        }
+
+        public static void SetFieldValue
+        (
+            this object obj, 
+            string fieldName, 
+            object val, 
+            bool includeNonPublic = true,
+            Type realType = null)
+        {
+            FieldInfo fieldInfo = GetFieldInfo(obj, fieldName, includeNonPublic, realType);
+
+            fieldInfo.SetValue(obj, val);
         }
 
         public static void SetPropValue(this object obj, string propName, object val, bool includeNonPublic = false)
