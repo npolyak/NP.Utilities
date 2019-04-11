@@ -458,5 +458,10 @@ namespace NP.Utilities
 
             return Path.GetDirectoryName(currentExecutablePath);
         }
+
+        public static Type FindTypeByFullName(string str)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == str);
+        }
     }
 }
