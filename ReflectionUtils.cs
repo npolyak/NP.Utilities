@@ -131,6 +131,15 @@ namespace NP.Utilities
             return sourcePropInfo;
         }
 
+        public static Type GetPropType
+        (
+            this Type type,
+            string propName,
+            bool includeNonPublic = false)
+        {
+            return type.GetPropInfoFromType(propName, includeNonPublic).PropertyType;
+        }
+
 
         public static FieldInfo GetFieldInfo
         (
