@@ -299,9 +299,9 @@ namespace NP.Utilities
             return fieldInfo;
         }
 
-        public static object GetStaticFieldValue(this Type type, string propName)
+        public static object GetStaticFieldValue(this Type type, string fieldName)
         {
-            FieldInfo fieldInfo = type.GetStaticFieldInfo(propName);
+            FieldInfo fieldInfo = type.GetStaticFieldInfo(fieldName);
 
             object val = fieldInfo.GetValue(type);
 

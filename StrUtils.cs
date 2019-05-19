@@ -52,7 +52,11 @@ namespace NP.Utilities
             return true;
         }
 
-        public static string SubstrFromTo
+        /// splits into 3 regions:
+        /// 1. Before the start
+        /// 2. [start to end)
+        /// 3. [end to str's end)
+        public static (string beginning, string foundStr, string end) SplitFromTo
         (
             this string str,
             string start,
@@ -60,8 +64,10 @@ namespace NP.Utilities
             bool firstOrLast = true // first by default
         )
         {
+            var defaultResult = (string.Empty, string.Empty, string.Empty);
+
             if (str == null)
-                return string.Empty;
+                return defaultResult;
 
             int startIdx = 0;
             int endIdx = str.Length;
@@ -91,9 +97,20 @@ namespace NP.Utilities
             }
 
             if (endIdx <= startIdx)
-                return string.Empty;
+                return defaultResult;
 
-            return str.Substring(startIdx, endIdx - startIdx);
+            return (str.Substring(0, startIdx), str.Substring(startIdx, endIdx - startIdx), str.Substring(startIdx));
+        }
+
+        public static string SubstrFromTo
+        (
+            this string str,
+            string start,
+            string end,
+            bool firstOrLast = true // first by default
+        )
+        {
+            return str.SplitFromTo(start, end, firstOrLast).foundStr;
         }
 
         public static string FirstCharToLowerCase(this string str, bool checkForChange = false)
