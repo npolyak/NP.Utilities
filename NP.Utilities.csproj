@@ -48,6 +48,7 @@
     <Compile Include="Attributes\MultiImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiPart.cs" />
     <Compile Include="Attributes\PartAttribute.cs" />
+    <Compile Include="Cache.cs" />
     <Compile Include="CollectionUtils.cs" />
     <Compile Include="DoubleParamMap.cs" />
     <Compile Include="ExpressionUtils.cs" />

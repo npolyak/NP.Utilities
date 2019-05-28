@@ -468,9 +468,17 @@ namespace NP.Utilities
             return Path.GetDirectoryName(currentExecutablePath);
         }
 
-        public static Type FindTypeByFullName(string str)
+        private static Type FindTypeByFullNameImpl(string str)
         {
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == str);
+        }
+
+        private static Cache<string, Type> _fullNameTypesCache = 
+            new Cache<string, Type>(FindTypeByFullNameImpl);
+
+        public static Type FindTypeByFullName(this string str)
+        {
+            return _fullNameTypesCache.Get(str);
         }
     }
 }

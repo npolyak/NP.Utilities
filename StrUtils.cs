@@ -29,10 +29,7 @@ namespace NP.Utilities
 
         public static string NullToEmpty(this string str)
         {
-            if (str == null)
-                return string.Empty;
-
-            return str;
+            return str ?? string.Empty;
         }
 
         public static bool StartsWith(this string str, IEnumerable<char> charsToFind, int idx = 0)
