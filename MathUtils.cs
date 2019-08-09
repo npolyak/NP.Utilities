@@ -2,6 +2,14 @@
 {
     public static class MathUtils
     {
+        public const int Gig = 1000_000_000;
+
+
+        public const int Million = 1000_000;
+
+        public const int Thousand = 1000;
+
+
         public static double NonNegative(this double d)
         {
             if (d < 0)
@@ -24,6 +32,19 @@
             }
 
             return 0;
+        }
+
+        public static bool IsDivisableBy(this int i, int divisor)
+        {
+            return i % divisor == 0;
+        }
+
+        public static string IntToStr(this int i, int divisor, string divisorLetter)
+        {
+            if (!i.IsDivisableBy(divisor))
+                return null;
+
+            return string.Format("{0:##,#}", i/divisor) + divisorLetter;
         }
     }
 }

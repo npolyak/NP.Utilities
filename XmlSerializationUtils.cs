@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -13,7 +9,7 @@ namespace NP.Utilities
     {
         public static string Serialize<T>(this T objToSerialize)
         {
-            ISaveable saveable = objToSerialize as ISaveable;
+            IPreSaveable saveable = objToSerialize as IPreSaveable;
 
             if (saveable != null)
             {
@@ -53,8 +49,8 @@ namespace NP.Utilities
             {
                 T result = (T)xmlSerializer.Deserialize(stringReader);
 
-                IRestorable restorable =
-                    result as IRestorable;
+                IPastRestorable restorable =
+                    result as IPastRestorable;
                 if (restorable != null)
                 {
                     restorable.AfterRestore();

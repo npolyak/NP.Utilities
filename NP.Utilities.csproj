@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NP.Utilities</RootNamespace>
     <AssemblyName>NP.Utilities</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -56,8 +56,10 @@
     <Compile Include="FolderUtils\FolderSaverRestorer.cs" />
     <Compile Include="FolderUtils\IOUtils.cs" />
     <Compile Include="FolderUtils\SaveableRestorableContainer.cs" />
-    <Compile Include="IRestorable.cs" />
-    <Compile Include="ISaveable.cs" />
+    <Compile Include="ICopyable.cs" />
+    <Compile Include="IPastRestorable.cs" />
+    <Compile Include="IPreSaveable.cs" />
+    <Compile Include="IStrSaveableRestorable.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="ObjUtils.cs" />
     <Compile Include="Point2D.cs" />
