@@ -48,6 +48,8 @@
     <Compile Include="Attributes\MultiImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiPart.cs" />
     <Compile Include="Attributes\PartAttribute.cs" />
+    <Compile Include="BasicInterfaces\ISelfClearable.cs" />
+    <Compile Include="BasicInterfaces\IStrRestorable.cs" />
     <Compile Include="Cache.cs" />
     <Compile Include="CollectionUtils.cs" />
     <Compile Include="DoubleParamMap.cs" />
@@ -56,10 +58,11 @@
     <Compile Include="FolderUtils\FolderSaverRestorer.cs" />
     <Compile Include="FolderUtils\IOUtils.cs" />
     <Compile Include="FolderUtils\SaveableRestorableContainer.cs" />
-    <Compile Include="ICopyable.cs" />
-    <Compile Include="IPastRestorable.cs" />
-    <Compile Include="IPreSaveable.cs" />
-    <Compile Include="IStrSaveableRestorable.cs" />
+    <Compile Include="BasicInterfaces\ICopyable.cs" />
+    <Compile Include="BasicInterfaces\IPastRestorable.cs" />
+    <Compile Include="BasicInterfaces\IPreSaveable.cs" />
+    <Compile Include="BasicInterfaces\IStrSaveable.cs" />
+    <Compile Include="BasicInterfaces\IStrSaveableRestorableClearable.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="ObjUtils.cs" />
     <Compile Include="Point2D.cs" />

@@ -131,6 +131,21 @@ namespace NP.Utilities
             return sourcePropInfo;
         }
 
+        public static MethodInfo GetMethodInfoFromType
+        (
+            this Type type,
+            string methodName,
+            bool includeNonPublic = false
+        )
+        {
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
+
+            MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);
+
+            return methodInfo;
+        }
+
+
         public static Type GetPropType
         (
             this Type type,
@@ -138,6 +153,29 @@ namespace NP.Utilities
             bool includeNonPublic = false)
         {
             return type.GetPropInfoFromType(propName, includeNonPublic).PropertyType;
+        }
+
+        public static Type GetMethodArgType
+        (
+            this Type type, 
+            string methodName, 
+            int argIdx = 0,
+            bool includeNonPublic = false
+        )
+        {
+            MethodInfo methodInfo = 
+                type.GetMethodInfoFromType(methodName, includeNonPublic);
+
+            ParameterInfo[] parameters = 
+                methodInfo.GetParameters();
+
+            if (argIdx >= parameters.Length)
+            {
+                throw new Exception($"Method '{type.Name}.{methodName}' " +
+                                    $"does not have parameter with index '{argIdx}'");
+            }
+
+            return parameters[argIdx].ParameterType;
         }
 
 
@@ -479,6 +517,11 @@ namespace NP.Utilities
         public static Type FindTypeByFullName(this string str)
         {
             return _fullNameTypesCache.Get(str);
+        }
+
+        public static Type GetCellTypeFromCollectionType(this Type collectionType)
+        {
+            return collectionType?.GetMethod("GetEnumerator")?.ReturnType?.GetProperty("Current")?.PropertyType;
         }
     }
 }

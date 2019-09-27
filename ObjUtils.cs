@@ -10,7 +10,10 @@
 // products that use it.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace NP.Utilities
 {
@@ -61,7 +64,7 @@ namespace NP.Utilities
             return obj.ToString();
         }
 
-        public static object TypeConvert(this object sourceValue, Type resultType)
+        public static object ConvertToType(this Type resultType, object sourceValue)
         {
             if ( (sourceValue == null) || resultType.IsAssignableFrom(sourceValue.GetType()))
             {
@@ -71,13 +74,57 @@ namespace NP.Utilities
             {
                 TypeConverter typeConverter = TypeDescriptor.GetConverter(resultType);
 
+                if (sourceValue is string strVal)
+                {
+                    if (typeConverter == null || (!typeConverter.CanConvertFrom(sourceValue.GetType())))
+                    {
+                        if (resultType.IsCollection())
+                        {
+                            var strItems =
+                                 strVal.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(str => str.Trim()).ToArray();
+
+                            Type collectionCellType =
+                                resultType.GenericTypeArguments.FirstOrDefault();
+
+                            if (collectionCellType == null)
+                                return null;
+
+                            IList resultList;
+                            if (resultType.IsAbstract)
+                            {
+                                Type collectionType = typeof(List<>).MakeGenericType(collectionCellType);
+                                resultList = Activator.CreateInstance(collectionType) as IList;
+                            }
+                            else
+                            {
+                                resultList = Activator.CreateInstance(resultType) as IList;
+                            }
+
+                            if (resultList == null)
+                            {
+                                return null;
+                            }
+                            
+                            foreach (string strItem in strItems)
+                            {
+                                resultList.Add(collectionCellType.ConvertToType(strItem));
+                            }
+
+                            return resultList;
+                        }
+
+                        return null;
+                    }
+                }
+
                 return typeConverter?.ConvertFrom(sourceValue);
             }
         }
 
         public static TTarget TypeConvert<TTarget>(this object source)
         {
-            object resultObj = source.TypeConvert(typeof(TTarget));
+            object resultObj = typeof(TTarget).ConvertToType(source);
 
             return resultObj.ObjToType<TTarget>();
         }

@@ -11,6 +11,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -196,6 +197,11 @@ namespace NP.Utilities
             streamWriter.Flush();
 
             return (((StreamWriter)streamWriter).BaseStream as MemoryStream).StreamToString();
+        }
+
+        public static string CollectionToStr(this IEnumerable coll, string separator = ", ")
+        {
+            return coll?.Cast<object>().StrConcat(null, separator);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace NP.Utilities
+﻿using System;
+
+namespace NP.Utilities
 {
     public static class MathUtils
     {
@@ -39,12 +41,43 @@
             return i % divisor == 0;
         }
 
-        public static string IntToStr(this int i, int divisor, string divisorLetter)
+        public static string IntToStr(this int i, int divisor, string divisorLetter, Func<int, int, bool> condition)
         {
-            if (!i.IsDivisableBy(divisor))
+            if (!condition(i, divisor))
                 return null;
 
-            return string.Format("{0:##,#}", i/divisor) + divisorLetter;
+            return string.Format("{0:##,#.###}", ((double) i)/ divisor) + divisorLetter;
+        }
+
+        public static string IntToStrIfDivisable(this int i, int divisor, string divisorLetter)
+        {
+            return i.IntToStr(divisor, divisorLetter, (intVal, div) => intVal.IsDivisableBy(div));
+        }
+
+        public static string IntToStrIfGreater(this int i, int divisor, string divisorLetter)
+        {
+            return i.IntToStr(divisor, divisorLetter, (intVal, div) => intVal >= div);
+        }
+
+        private static string IntToStr(this int intVal, Func<int, int, bool> condition)
+        {
+            string str =
+                    intVal.IntToStr(MathUtils.Gig, "G", condition) ??
+                    intVal.IntToStr(MathUtils.Million, "M", condition) ??
+                    intVal.IntToStr(MathUtils.Thousand, "K", condition) ??
+                    intVal.IntToStr(1, "", condition);
+
+            return str;
+        }
+
+        public static string IntToStrIfDivisable(this int intVal)
+        {
+            return intVal.IntToStr((i, div) => i.IsDivisableBy(div));
+        }
+
+        public static string IntToStrIfGreater(this int intVal)
+        {
+            return intVal.IntToStr((i, div) => i >= div);
         }
     }
 }
