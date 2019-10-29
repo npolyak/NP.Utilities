@@ -9,24 +9,28 @@
 // Also as a courtesy, please, mention this software in any documentation for the 
 // products that use it.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace NP.Utilities
 {
     public class TreeNodeInfo<NodeType>
     {
+        public NodeType Parent { get; }
+
         /// <summary>
-        /// A tree node object
+        /// current tree node object
         /// </summary>
-        public NodeType TheNode;
+        public NodeType Node { get; }
 
         /// <summary>
         /// Integer specifying a distance between the original level 
         /// and the TreeNode object within the tree hierarchy.
         /// </summary>
-        public int Level { get; set; }
+        public int Level { get; }
+
+        public TreeNodeInfo(NodeType parent, NodeType node, int level)
+        {
+            Parent = parent;
+            Node = node;
+            Level = level;
+        }
     }
 }

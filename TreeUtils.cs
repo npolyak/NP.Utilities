@@ -106,6 +106,7 @@ namespace NP.Utilities
         static IEnumerable<TreeNodeInfo<NodeType>> CollectionDescendants<NodeType>
         (
             this IEnumerable<NodeType> nodeTypeCollection,
+            NodeType parentNode,
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction,
             int level
         )
@@ -114,7 +115,7 @@ namespace NP.Utilities
             {
                 foreach (NodeType child in nodeTypeCollection)
                 {
-                    foreach (TreeNodeInfo<NodeType> descendantNode in child.SelfAndDescendantsWithLevelInfo(toChildrenFunction, level))
+                    foreach (TreeNodeInfo<NodeType> descendantNode in child.SelfAndDescendantsWithLevelInfo(parentNode, toChildrenFunction, level))
                     {
                         yield return descendantNode;
                     }
@@ -139,17 +140,18 @@ namespace NP.Utilities
         public static IEnumerable<TreeNodeInfo<NodeType>> SelfAndDescendantsWithLevelInfo<NodeType>
         (
             this NodeType node,
+            NodeType parentNode, 
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction,
             int level = 0
         )
         {
             if (node != null)
             {
-                yield return new TreeNodeInfo<NodeType> { Level = level, TheNode = node };
+                yield return new TreeNodeInfo<NodeType>(parentNode, node, level);
 
                 IEnumerable<NodeType> children = toChildrenFunction(node);
 
-                foreach (TreeNodeInfo<NodeType> descendant in children.CollectionDescendants<NodeType>(toChildrenFunction, level + 1))
+                foreach (TreeNodeInfo<NodeType> descendant in children.CollectionDescendants(node, toChildrenFunction, level + 1))
                 {
                     yield return descendant;
                 }
@@ -170,7 +172,7 @@ namespace NP.Utilities
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction
         )
         {
-            return node.SelfAndDescendantsWithLevelInfo(toChildrenFunction).Skip(1);
+            return node.SelfAndDescendantsWithLevelInfo(default, toChildrenFunction).Skip(1);
         }
 
         /// <summary>
@@ -186,7 +188,7 @@ namespace NP.Utilities
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction
         )
         {
-            return node.SelfAndDescendantsWithLevelInfo(toChildrenFunction).Select((treeChildInfo) => treeChildInfo.TheNode);
+            return node.SelfAndDescendantsWithLevelInfo(default, toChildrenFunction).Select((treeChildInfo) => treeChildInfo.Node);
         }
 
         public static IEnumerable<ResultType> SelfAndDescendants<NodeType, ResultType>
@@ -195,8 +197,8 @@ namespace NP.Utilities
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction
         ) where ResultType : NodeType
         {
-            return node.SelfAndDescendantsWithLevelInfo(toChildrenFunction)
-                .Select((treeChildInfo) => treeChildInfo.TheNode)
+            return node.SelfAndDescendantsWithLevelInfo(default, toChildrenFunction)
+                .Select((treeChildInfo) => treeChildInfo.Node)
                 .GetItemsOfType<NodeType, ResultType>();
         }
 
@@ -213,7 +215,7 @@ namespace NP.Utilities
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction
         )
         {
-            return node.DescendantsWithLevelInfo(toChildrenFunction).Select((treeChildInfo) => treeChildInfo.TheNode);
+            return node.DescendantsWithLevelInfo(toChildrenFunction).Select((treeChildInfo) => treeChildInfo.Node);
         }
 
         public static IEnumerable<ResultType> Descendants<NodeType, ResultType>
@@ -223,7 +225,7 @@ namespace NP.Utilities
         ) where ResultType : NodeType
         {
             return node.DescendantsWithLevelInfo(toChildrenFunction)
-                .Select((treeChildInfo) => treeChildInfo.TheNode)
+                .Select((treeChildInfo) => treeChildInfo.Node)
                 .GetItemsOfType<NodeType, ResultType>();
         }
 
@@ -249,12 +251,12 @@ namespace NP.Utilities
             int level = 0;
             foreach (NodeType ancestor in ancestorsStartingFromRoot)
             {
-                yield return new TreeNodeInfo<NodeType> { Level = level, TheNode = ancestor };
+                yield return new TreeNodeInfo<NodeType>(toParentFunction(ancestor), ancestor, level);
 
                 level++;
             }
 
-            foreach (TreeNodeInfo<NodeType> nodeInfo in node.SelfAndDescendantsWithLevelInfo(toChildrenFunction, level))
+            foreach (TreeNodeInfo<NodeType> nodeInfo in node.SelfAndDescendantsWithLevelInfo(toParentFunction(node), toChildrenFunction, level))
             {
                 yield return nodeInfo;
             }
@@ -295,7 +297,7 @@ namespace NP.Utilities
                 toChildrenFunction(topAncestor).
                     Where((topLevelChild) => (!object.ReferenceEquals(topLevelChild, topLevelChildAncestor)));
 
-            return topLevelChildrenWithoutChildAncestor.CollectionDescendants(toChildrenFunction, 1);
+            return topLevelChildrenWithoutChildAncestor.CollectionDescendants(topAncestor, toChildrenFunction, 1);
         }
 
         private static void PrintStr(

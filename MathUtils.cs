@@ -79,5 +79,29 @@ namespace NP.Utilities
         {
             return intVal.IntToStr((i, div) => i >= div);
         }
+
+        public static double NormalizeAngle(this double angle)
+        {
+            int numberCircles = (int)angle / 360;
+
+            double result = angle - angle * numberCircles;
+
+            if (result < 0)
+                result += 360;
+
+            return result;
+        }
+
+        public static double GetBestNorimalizedAngleAfterAngle(this double angleAfter, double angle)
+        {
+            angleAfter = angleAfter.NormalizeAngle();
+
+            while(angleAfter < angle)
+            {
+                angleAfter += 360;
+            }
+
+            return angleAfter;
+        }
     }
 }

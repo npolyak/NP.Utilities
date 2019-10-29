@@ -284,6 +284,36 @@ namespace NP.Utilities
             return coll.FindItemAndIdx(lookupItem, predicate).Idx;
         }
 
+        public static int IndexOf<T>(this IEnumerable<T> collection, Func<T, bool> f)
+        {
+            int i = -1;
+            foreach(T item in collection)
+            {
+                i++;
+                if (f(item))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static int LastIndexOf<T>(this IEnumerable<T> collection, Func<T, bool> f)
+        {
+            int i = collection.Count();
+            foreach (T item in collection.Reverse())
+            {
+                i--;
+                if (f(item))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         public static void AddIfNotThere<T>
         (
             this IList<T> collection,
