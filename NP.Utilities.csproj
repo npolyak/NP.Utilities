@@ -48,6 +48,7 @@
     <Compile Include="Attributes\MultiImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiPart.cs" />
     <Compile Include="Attributes\PartAttribute.cs" />
+    <Compile Include="BasicInterfaces\INameContainer.cs" />
     <Compile Include="BasicInterfaces\ISelfClearable.cs" />
     <Compile Include="BasicInterfaces\IStrRestorable.cs" />
     <Compile Include="Cache.cs" />

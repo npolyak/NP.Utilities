@@ -72,7 +72,32 @@ namespace NP.Utilities
             }
             else
             {
-                TypeConverter typeConverter = TypeDescriptor.GetConverter(resultType);
+                TypeConverter typeConverter = null;
+
+                if (resultType.IsAbstract)
+                {
+                    TypeConverterAttribute attr =
+                        resultType.GetCustomAttributes(typeof(TypeConverterAttribute), false).FirstOrDefault() as TypeConverterAttribute;
+
+                    if (attr != null)
+                    {
+                        string typeConverterTypeName = attr.ConverterTypeName.SubstrFromTo(null, ",");
+
+                        if (typeConverterTypeName != null)
+                        {
+                            Type typeConverterType = ReflectionUtils.FindTypeByFullName(typeConverterTypeName);
+
+                            if (typeConverterType != null)
+                            {
+                                typeConverter = Activator.CreateInstance(typeConverterType) as TypeConverter;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    typeConverter = TypeDescriptor.GetConverter(resultType);
+                }
 
                 if (sourceValue is string strVal)
                 {

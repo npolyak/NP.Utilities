@@ -523,5 +523,10 @@ namespace NP.Utilities
         {
             return collectionType?.GetMethod("GetEnumerator")?.ReturnType?.GetProperty("Current")?.PropertyType;
         }
+
+        public static string GetAssemblyNameFromAssemblyResolveArgs(this ResolveEventArgs args)
+        {
+            return args.Name.SubstrFromTo(null, ",");
+        }
     }
 }
