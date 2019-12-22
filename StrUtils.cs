@@ -123,6 +123,12 @@ namespace NP.Utilities
             return lowerFirstChar + str.Substring(1);
         }
 
+        public static string LastChunk
+        (
+            this string str,
+            string start,
+            string end = null
+        ) => SubstrFromTo(str, start, end, false);
 
         public static string StrConcat<T>
         (
@@ -202,6 +208,11 @@ namespace NP.Utilities
         public static string CollectionToStr(this IEnumerable coll, string separator = ", ")
         {
             return coll?.Cast<object>().StrConcat(null, separator);
+        }
+
+        public static void Throw(this string str)
+        {
+            throw new Exception(str);
         }
     }
 }

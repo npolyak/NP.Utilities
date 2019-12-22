@@ -468,22 +468,22 @@ namespace NP.Utilities
             propInfo.SetValue(null, valueToSet);
         }
 
-        public static IEnumerable<T> GetMemberAttrs<T>(this MemberInfo memberInfo)
+        public static IEnumerable<T> GetAttrs<T>(this ICustomAttributeProvider memberInfo)
             where T : Attribute
         {
-            return memberInfo.GetCustomAttributes<T>();
+            return memberInfo.GetCustomAttributes(typeof(T), false) as IEnumerable<T>;
         }
 
-        public static TAttr GetMemberAttr<TAttr>(this MemberInfo memberInfo)
+        public static TAttr GetAttr<TAttr>(this ICustomAttributeProvider memberInfo)
             where TAttr : Attribute
         {
-            return memberInfo.GetCustomAttributes<TAttr>().FirstOrDefault();
+            return memberInfo.GetAttrs<TAttr>().FirstOrDefault();
         }
 
-        public static bool ContainsAttr<TAttr>(this MemberInfo memberInfo)
+        public static bool ContainsAttr<TAttr>(this ICustomAttributeProvider memberInfo)
             where TAttr : Attribute
         {
-            return memberInfo.GetMemberAttr<TAttr>() != null;
+            return memberInfo.GetAttr<TAttr>() != null;
         }
 
         public static Type GetBaseTypeOrFirstInterface(this Type type)
@@ -527,6 +527,11 @@ namespace NP.Utilities
         public static string GetAssemblyNameFromAssemblyResolveArgs(this ResolveEventArgs args)
         {
             return args.Name.SubstrFromTo(null, ",");
+        }
+
+        public static bool IsVoid(this Type type)
+        {
+            return type == null || type.FullName == "System.Void";
         }
     }
 }

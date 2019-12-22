@@ -64,6 +64,11 @@ namespace NP.Utilities
             return obj.ToString();
         }
 
+        public static bool IsNullOrEmptyCollection(this object obj)
+        {
+            return obj == null || (obj is IEnumerable enumerable && enumerable.IsNullOrEmpty());
+        }
+
         public static object ConvertToType(this Type resultType, object sourceValue)
         {
             if ( (sourceValue == null) || resultType.IsAssignableFrom(sourceValue.GetType()))

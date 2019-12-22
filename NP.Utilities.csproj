@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\CompositeConstructorAttribute.cs" />
     <Compile Include="Attributes\ImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiPart.cs" />

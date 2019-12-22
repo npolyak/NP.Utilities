@@ -13,7 +13,7 @@ using System;
 
 namespace NP.Utilities.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class MultiPartAttribute : PartAttribute
     {
         public MultiPartAttribute(object partObjKey = null) : base(partObjKey)
