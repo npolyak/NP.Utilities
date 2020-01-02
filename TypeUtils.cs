@@ -33,6 +33,11 @@ namespace NP.Utilities
             return GetTypeName(type.Name);
         }
 
+        public static string GetTypeNameWithNamespaceAndNumberGenericParams(this Type type)
+        {
+            return type.FullName.SubstrFromTo(null, "[");
+        }
+
         public static string NestedTypeToName(this Type type)
         {
             string currentTypeName = type.GetTypeName();
@@ -69,9 +74,13 @@ namespace NP.Utilities
         }
 
         // include the generic params
-        public static string GetFullTypeName(this Type type)
+        public static string GetFullTypeName(this Type type, Func<Type, string> simpleTypeToStr = null)
         {
-            string result = type.GetTypeName();
+            if(simpleTypeToStr == null)
+            {
+                simpleTypeToStr = (t) => t.GetTypeName();
+            }
+            string result = simpleTypeToStr(type);
 
             if (type.IsGenericType)
             {
@@ -89,12 +98,17 @@ namespace NP.Utilities
                         firstIteration = false;
                     }
 
-                    result += typeParam.GetFullTypeName();
+                    result += typeParam.GetFullTypeName(simpleTypeToStr).Box();
                 }
                 result += ">";
             }
 
             return result;
+        }
+
+        public static string GetFullTypeNameWithNamespaces(this Type type)
+        {
+            return GetFullTypeName(type, (t) => t.GetTypeNameWithNamespaceAndNumberGenericParams());
         }
 
         public static List<string> 

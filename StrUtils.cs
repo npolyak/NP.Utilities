@@ -210,9 +210,6 @@ namespace NP.Utilities
             return coll?.Cast<object>().StrConcat(null, separator);
         }
 
-        public static void Throw(this string str)
-        {
-            throw new Exception(str);
-        }
+        public static void Throw(this string str) => throw new Exception(str);
     }
 }

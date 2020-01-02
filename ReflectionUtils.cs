@@ -16,6 +16,7 @@ using System.Reflection;
 
 namespace NP.Utilities
 {
+    using System.Collections;
     using System.IO;
     using static NP.Utilities.StrUtils;
 
@@ -508,20 +509,59 @@ namespace NP.Utilities
 
         private static Type FindTypeByFullNameImpl(string str)
         {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == str);
+            return AppDomain.CurrentDomain
+                            .GetAssemblies()
+                            .SelectMany(a => a.GetTypes())
+                            .FirstOrDefault(t => t.FullName == str);
+        }
+
+        public static Type RestoreType(string str)
+        {
+            return FindTypeByFullNameImpl(str);
         }
 
         private static Cache<string, Type> _fullNameTypesCache = 
-            new Cache<string, Type>(FindTypeByFullNameImpl);
+            new Cache<string, Type>(RestoreType);
 
         public static Type FindTypeByFullName(this string str)
         {
             return _fullNameTypesCache.Get(str);
         }
 
+        public static Type GetTypeByAssemblyQualifiedName(this string assemblyQualifiedTypeName)
+        {
+            static Assembly FindAssembly(AssemblyName assemblyName)
+            {
+                return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == assemblyName.FullName);
+            }
+
+            static Type FindType(Assembly assembly, string typeName, bool ignoreCase)
+            {
+                return assembly.GetType(typeName);
+            }
+
+            Type type = Type.GetType(assemblyQualifiedTypeName, FindAssembly, FindType);
+
+            return type;
+        }
+
         public static Type GetCellTypeFromCollectionType(this Type collectionType)
         {
-            return collectionType?.GetMethod("GetEnumerator")?.ReturnType?.GetProperty("Current")?.PropertyType;
+            return collectionType
+                    ?.GetMethod("GetEnumerator")
+                    ?.ReturnType
+                    ?.GetProperty("Current")
+                    ?.PropertyType;
+        }
+
+        public static (bool IsCollection, Type CellType) GetIsCollectionInfo(this Type type)
+        {
+            if (type == null || !typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                return (false, null);
+            }
+
+            return (true, type.GetCellTypeFromCollectionType());
         }
 
         public static string GetAssemblyNameFromAssemblyResolveArgs(this ResolveEventArgs args)
@@ -532,6 +572,16 @@ namespace NP.Utilities
         public static bool IsVoid(this Type type)
         {
             return type == null || type.FullName == "System.Void";
+        }
+
+        public static object GetDefaultForType(this Type type)
+        {
+            if (type?.IsValueType == true)
+            {
+                return Activator.CreateInstance(type);
+            }
+
+            return null;
         }
     }
 }
