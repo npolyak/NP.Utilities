@@ -4,6 +4,6 @@
     {
         bool IsMatching { get; }
 
-        public void CheckMatching(string str);
+        void CheckMatching(string str);
     }
 }
