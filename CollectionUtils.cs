@@ -53,7 +53,19 @@ namespace NP.Utilities
             }
         }
 
+        public static int Count(this IEnumerable collection)
+        {
+            if (collection == null)
+                return 0;
 
+            int count = 0;
+            foreach(var item in collection)
+            {
+                count++;
+            }
+
+            return count;
+        }
 
         public static IEnumerable<ResultType>
             GetItemsOfType<BaseType, ResultType>(this IEnumerable<BaseType> inputCollection)

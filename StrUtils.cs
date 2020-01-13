@@ -211,5 +211,11 @@ namespace NP.Utilities
         }
 
         public static void Throw(this string str) => throw new Exception(str);
+
+        public static TEnum Parse<TEnum>(this string str)
+            where TEnum : struct
+        {
+            return (TEnum)Enum.Parse(typeof(TEnum), str);
+        }
     }
 }

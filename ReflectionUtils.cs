@@ -532,7 +532,7 @@ namespace NP.Utilities
         {
             static Assembly FindAssembly(AssemblyName assemblyName)
             {
-                return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == assemblyName.FullName);
+                return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.GetName().Name == assemblyName.Name);
             }
 
             static Type FindType(Assembly assembly, string typeName, bool ignoreCase)
