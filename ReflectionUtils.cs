@@ -556,7 +556,7 @@ namespace NP.Utilities
 
         public static (bool IsCollection, Type CellType) GetIsCollectionInfo(this Type type)
         {
-            if (type == null || !typeof(IEnumerable).IsAssignableFrom(type))
+            if (!type.IsCollection())
             {
                 return (false, null);
             }
@@ -572,6 +572,11 @@ namespace NP.Utilities
         public static bool IsVoid(this Type type)
         {
             return type == null || type.FullName == "System.Void";
+        }
+
+        public static bool IsVoid(this MethodInfo methodInfo)
+        {
+            return methodInfo.ReturnType.IsVoid();
         }
 
         public static object GetDefaultForType(this Type type)

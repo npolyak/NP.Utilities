@@ -50,6 +50,19 @@ namespace NP.Utilities
             return true;
         }
 
+        public static (string firstRegion, string lastRegion) SplitIntoTwo(this string str, string separator, bool fromBeginningOrEnd = true)
+        {
+            int idx = 
+                fromBeginningOrEnd ? str.IndexOf(separator) : str.LastIndexOf(separator);
+
+            if (idx < 0)
+            {
+                return (str, null);
+            }
+
+            return (str.Substring(0, idx), str.Substring(idx + separator.Length));
+        }
+
         /// splits into 3 regions:
         /// 1. Before the start
         /// 2. [start to end)

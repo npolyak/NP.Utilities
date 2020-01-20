@@ -220,7 +220,7 @@ namespace NP.Utilities
 
         public static bool IsCollection(this Type type)
         {
-            return typeof(IEnumerable).IsAssignableFrom(type);
+            return (type != null) && typeof(IEnumerable).IsAssignableFrom(type);
         }
 
         public static Type GetChildType(this Type type, string propName)
