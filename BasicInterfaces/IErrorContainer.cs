@@ -4,6 +4,6 @@
     {
         string ErrorMsg { get; }
 
-        bool HasError { get; }
+        bool HasError => ErrorMsg != null;
     }
 }
