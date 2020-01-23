@@ -140,7 +140,7 @@ namespace NP.Utilities
                         continue;
                 }
 
-                collection.Add(el);
+               collection.Add(el);
             }
         }
 
@@ -311,19 +311,26 @@ namespace NP.Utilities
             return -1;
         }
 
-        public static int LastIndexOf<T>(this IEnumerable<T> collection, Func<T, bool> f)
+        public static int LastIndexOf<T>(this IEnumerable<T> collection, Func<T, bool> lastIdxFn)
         {
             int i = collection.Count();
             foreach (T item in collection.Reverse())
             {
                 i--;
-                if (f(item))
+                if (lastIdxFn(item))
                 {
                     return i;
                 }
             }
 
             return -1;
+        }
+
+        public static void InsertAfterLastIndexOf<T>(this IList<T> list, Func<T, bool> lastIdxFn, T itemToInsert)
+        {
+            int lastIdx = list.LastIndexOf(lastIdxFn);
+
+            list.Insert(lastIdx + 1, itemToInsert);
         }
 
         public static void AddIfNotThere<T>
