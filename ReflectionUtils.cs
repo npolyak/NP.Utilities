@@ -285,12 +285,12 @@ namespace NP.Utilities
         )           
             where T : class
         {
-            (string firstLink, string remainder) =
+            (string firstLink, _, string remainder) =
                 compoundPropName.BreakStrAtSeparator(PLAIN_PROP_PATH_LINK_SEPARATOR);
 
             object nextObj = obj.GetPropValue<T>(firstLink);
 
-            if (remainder == null)
+            if (remainder.IsNullOrEmpty())
                 return (T) nextObj;
 
             return nextObj?.GetCompoundPropValue<T>(remainder);
@@ -300,10 +300,10 @@ namespace NP.Utilities
         {
             object nextObj = obj;
 
-            (string firstLink, string remainder) =
+            (string firstLink, _, string remainder) =
                 compoundPropName.BreakStrAtSeparator(PLAIN_PROP_PATH_LINK_SEPARATOR);
 
-            if (remainder == null)
+            if (remainder.IsNullOrEmpty())
             {
                 obj.SetPropValue(firstLink, val);
                 return;
@@ -382,7 +382,7 @@ namespace NP.Utilities
             Assembly result =
                 AppDomain.CurrentDomain
                          .GetAssemblies()
-                         .FirstOrDefault(assembly => assembly.FullName == assemblyName.FullName);
+                         .LastOrDefault(assembly => assembly.FullName == assemblyName.FullName);
 
             if (result == null)
                 result = Assembly.Load(assemblyName);

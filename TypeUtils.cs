@@ -66,6 +66,8 @@ namespace NP.Utilities
                     return "bool";
                 case "Byte":
                     return "byte";
+                case "Char":
+                    return "char";
                 case "Void":
                     return "void";
             }
@@ -74,13 +76,13 @@ namespace NP.Utilities
         }
 
         // include the generic params
-        public static string GetFullTypeName(this Type type, Func<Type, string> simpleTypeToStr = null)
+        public static string GetFullTypeName(this Type type, Func<Type, string> typeToStr = null)
         {
-            if(simpleTypeToStr == null)
+            if(typeToStr == null)
             {
-                simpleTypeToStr = (t) => t.GetTypeName();
+                typeToStr = (t) => t.GetTypeName();
             }
-            string result = simpleTypeToStr(type);
+            string result = typeToStr(type).Box();
 
             if (type.IsGenericType)
             {
@@ -98,7 +100,7 @@ namespace NP.Utilities
                         firstIteration = false;
                     }
 
-                    result += typeParam.GetFullTypeName(simpleTypeToStr).Box();
+                    result += typeParam.GetFullTypeName(typeToStr).Box();
                 }
                 result += ">";
             }

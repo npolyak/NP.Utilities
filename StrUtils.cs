@@ -183,19 +183,19 @@ namespace NP.Utilities
             return string.IsNullOrWhiteSpace(str);
         }
 
-        public static (string, string) BreakStrAtSeparator(this string strToBreak, string separator, bool firstOrLast = true)
+        public static (string, string, string) BreakStrAtSeparator(this string strToBreak, string separator, int idxToStartFrom = 0, bool firstOrLast = true)
         {
             int idx = 
                 firstOrLast ? 
-                    strToBreak.IndexOf(separator) : 
-                    strToBreak.LastIndexOf(separator);
+                    strToBreak.IndexOf(separator, idxToStartFrom) : 
+                    strToBreak.LastIndexOf(separator, idxToStartFrom);
 
             if (idx < 0)
             {
-                return (strToBreak, null);
+                return (strToBreak, "", "");
             }
 
-            return (strToBreak.Substring(0, idx), strToBreak.Substring(idx + separator.Length));
+            return (strToBreak.Substring(0, idx), separator, strToBreak.Substring(idx + separator.Length));
         }
 
 

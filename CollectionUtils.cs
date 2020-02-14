@@ -124,7 +124,7 @@ namespace NP.Utilities
 
         public static void AddAll<T>
         (
-            this IList<T> collection, 
+            this ICollection<T> collection, 
             IEnumerable<T> collectionToAdd, 
             bool noDuplicates = false
         )
@@ -146,7 +146,7 @@ namespace NP.Utilities
 
         public static void RemoveMatching<T, LookupType>
         (
-            this IList<T> collection,
+            this ICollection<T> collection,
             LookupType lookupItem,
             Func<T, LookupType, bool> predicate
         )
@@ -365,6 +365,32 @@ namespace NP.Utilities
             }
         }
 
+        /// <summary>
+        /// check if the collections have the equivalent entries, but perhaps in different order
+        /// WE ASSUME, THERE ARE NO DUPLICATION IN coll1 collection !!! Otherwise - this won't work
+        /// </summary>
+        /// <returns></returns>
+        public static bool AreEquivalentCollections<T>(this IEnumerable<T> coll1, IEnumerable<T> coll2, Func<T, T, bool> comparisonFn)
+        {
+            if (coll1.IsNullOrEmptyCollection())
+                return coll2.IsNullOrEmptyCollection();
+
+            if (coll2.IsNullOrEmptyCollection())
+                return false;
+
+            if (coll1.Count() != coll2.Count())
+                return false;
+
+            // Assuming there are no duplicates in coll1, 
+            // one comparison iteration should be enough
+            foreach(var v1 in coll1)
+            {
+                if (coll2.All(v2 => !comparisonFn(v1, v2)))
+                    return false;
+            }
+
+            return true;
+        }
 
         public static bool IsInValCollection<T>(this T obj, IEnumerable<object> valueCollection)
         {
@@ -456,6 +482,11 @@ namespace NP.Utilities
             {
                 list.Remove(item);
             }
+        }
+
+        public static IEnumerable<T> UnionSingle<T>(this IEnumerable<T> collection, params T[] additionalParams)
+        {
+            return collection.Union(additionalParams);
         }
     }
 }

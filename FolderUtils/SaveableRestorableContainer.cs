@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace NP.Utilities.FolderUtils
 {
     public class SaveableRestorableContainer<T> :
-        FolderSaverRestorer,
+        ItemToFolderSaverRestorer,
         INotifyPropertyChanged
         where T : new()
     {
