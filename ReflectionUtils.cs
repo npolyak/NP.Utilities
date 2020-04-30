@@ -16,8 +16,10 @@ using System.Reflection;
 
 namespace NP.Utilities
 {
+    using NP.Utilities.BasicInterfaces;
     using System.Collections;
     using System.IO;
+    using System.Threading.Tasks;
     using static NP.Utilities.StrUtils;
 
     public static class ReflectionUtils
@@ -449,7 +451,7 @@ namespace NP.Utilities
 
         public static string GetFullGenericTypeName(this Type type)
         {
-            return type.FullName.SubstrFromTo(null, "[");
+                return type.FullName.SubstrFromTo(null, "[");
         }
 
         public static string GetFullTypeStr(this Type type)
@@ -485,6 +487,30 @@ namespace NP.Utilities
             where TAttr : Attribute
         {
             return memberInfo.GetAttr<TAttr>() != null;
+        }
+
+        public static IEnumerable<Type> GetSelfSuperTypesAndInterfaces(this Type type)
+        {
+            if (type == null)
+                yield break;
+
+            yield return type;
+
+            if (type.BaseType != null)
+            {
+                foreach(var superType in type.BaseType.GetSelfSuperTypesAndInterfaces())
+                {
+                    yield return superType;
+                }
+            }
+
+            foreach(var interfaceType in type.GetInterfaces())
+            {
+                foreach(var superInterface in interfaceType.GetSelfSuperTypesAndInterfaces())
+                {
+                    yield return superInterface;
+                }
+            }
         }
 
         public static Type GetBaseTypeOrFirstInterface(this Type type)
@@ -587,6 +613,224 @@ namespace NP.Utilities
             }
 
             return null;
+        }
+
+        public static IEnumerable<Type> GetAllGenericTypeParams(this Type type)
+        {
+            if (type == null)
+                yield break;
+
+            if (type.IsGenericParameter)
+                yield return type;
+
+            if (type.IsGenericType)
+            {
+                foreach (var genericArg in type.GetGenericArguments())
+                {
+                    foreach (var genericSubTypeParam in genericArg.GetAllGenericTypeParams())
+                    {
+                        yield return genericSubTypeParam;
+                    }
+                }
+            }
+        }
+
+        public static bool IsConcrete(this Type type)
+        {
+            return (type != null) && !type.GetAllGenericTypeParams().Any();
+        }
+
+        public static bool CheckConcreteTypeSatisfiesGenericParamConstraints(this Type concreteType, Type genericParamType)
+        {
+            bool hasReferenceTypeConstraint = 
+                genericParamType.GenericParameterAttributes
+                                .HasFlag(GenericParameterAttributes.ReferenceTypeConstraint);
+
+            bool hasNewConstraint =
+                genericParamType.GenericParameterAttributes
+                                .HasFlag(GenericParameterAttributes.DefaultConstructorConstraint);
+
+            bool isNonNullable = 
+                genericParamType.GenericParameterAttributes
+                                .HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint);
+
+            if (hasReferenceTypeConstraint)
+            {
+                if (concreteType.IsValueType)
+                    return false;
+            }
+            else if (isNonNullable && !concreteType.IsValueType)
+            {
+                return true;
+            }
+
+            if (hasNewConstraint)
+            {
+                ConstructorInfo constrInfo = 
+                    concreteType.GetConstructor(new Type[] { });
+
+                if (constrInfo != null)
+                    return false;
+            }
+
+            Type[] constraintTypes = 
+                genericParamType.GetGenericParameterConstraints();
+
+            if (constraintTypes == null)
+                return true;
+
+            Type[] concreteTypeSuperTypes =
+                concreteType.GetSelfSuperTypesAndInterfaces().Distinct().ToArray();
+
+            foreach (Type constraintType in constraintTypes)
+            {
+                if (!concreteTypeSuperTypes.Contains(constraintType))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static Type GetGenericMatchingSuperType(this Type typeToScan, Type typeToCompare)
+        {
+            var matchingSuperType =
+                typeToScan.GetSelfSuperTypesAndInterfaces()
+                    .Distinct()
+                    .Where(arg => arg.IsGenericType)
+                    .FirstOrDefault(arg => arg.GetGenericTypeDefinition() ==
+                                            typeToCompare.GetGenericTypeDefinition());
+
+            return matchingSuperType;
+        }
+
+
+        /// <summary>
+        /// Checks if the argToResolveType can be used to resolve a
+        /// genericArgType as a parameter in some
+        /// method or class. E.g. for method static void DoSmth<TKey, TVal>(IDictionary<TKey, TVal> dict) where TVal : struct { }
+        /// we can check if Dictionary<int, double> will fit to be passed as dict argument 
+        ///     (answer is yes, so it will return true)
+        /// or we can check if Dictionary<int, object> will fit 
+        ///     (answer is no, because of the 'struct' constraint, so it will return false).
+        /// If it can resolve all generic type parameters, it will also populate 
+        /// the ConcreteType property of members of the collection 'typesToConcretize' with 
+        /// the concrete types to replace the generic type parameters. In case of 
+        /// Dict<int, double>, the Concrete types for the corresponding collection members will be 
+        ///     typeof(int) and typeof(double). 
+        /// The typesToConcretize collection should already contain the 
+        /// entries corresponding to every generic parameter 
+        /// that the genericArgType depends on (for the example above, it will contain 2 entries - 
+        /// one for TKey and another for TVal).
+        /// </summary>
+        public static bool ResolveType
+        (
+            this Type sourceArgType,
+            Type targetArgType,
+            IEnumerable<IGenericParamInfo> genericTypeParamsToConcretize,
+            bool resolveTypesFromSourceToTarget = true)
+        {
+            if (targetArgType == null)
+                return true;
+
+            if ((resolveTypesFromSourceToTarget && targetArgType.IsGenericParameter) ||
+                 (!resolveTypesFromSourceToTarget && sourceArgType.IsGenericParameter))
+            {
+                if (!resolveTypesFromSourceToTarget)
+                {
+                    var saveTargetArgType = targetArgType;
+                    targetArgType = sourceArgType;
+                    sourceArgType = saveTargetArgType;
+                }
+
+                IGenericParamInfo foundParamInfo = genericTypeParamsToConcretize.Single(t => t.GenericParameterType == targetArgType);
+
+                if (!sourceArgType.CheckConcreteTypeSatisfiesGenericParamConstraints(foundParamInfo.GenericParameterType))
+                {
+                    return false;
+                }
+
+                foundParamInfo.PluggedInType = sourceArgType;
+
+                return true;
+            }
+            else if (targetArgType.IsGenericType)
+            {
+                var matchingSuperType =
+                        sourceArgType.GetGenericMatchingSuperType(targetArgType);
+
+                if (matchingSuperType == null)
+                    return false;
+
+                Type[] sourceArgSubTypes = matchingSuperType.GetGenericArguments();
+                Type[] targetArgSubTypes = targetArgType.GetGenericArguments();
+
+                foreach ((Type sourceArgSubType, Type targetArgSubType) in sourceArgSubTypes.Zip(targetArgSubTypes, (c, g) => (c, g)))
+                {
+                    if (!sourceArgSubType.ResolveType(targetArgSubType, genericTypeParamsToConcretize, resolveTypesFromSourceToTarget))
+                        return false;
+                }
+
+                return true;
+            }
+
+            return targetArgType.IsAssignableFrom(sourceArgType);
+
+        }
+
+        public static bool IsTask(this Type type)
+        {
+            return typeof(Task).IsAssignableFrom(type);
+        }
+
+        public static string GetTypeAndMethodName(this MethodInfo methodInfo)
+        {
+            string fullTypeName = methodInfo.DeclaringType.FullName;
+            string methodName = methodInfo.Name;
+
+            return fullTypeName + ":" + methodName;
+        }
+
+        public static bool IsDelegateType(this Type type)
+        {
+            return typeof(Delegate).IsAssignableFrom(type);
+        }
+
+        public static bool IsVoidDelegate(this Type type)
+        {
+            if (!type.IsDelegateType())
+            {
+                return false;
+            }
+
+            return
+                type.GetDelegateReturnType() == null;
+        }
+
+        public static Type GetDelegateReturnType(this Type type)
+        {
+            if (type.IsDelegateType())
+            {
+                Type delegateReturnType = type.GetMethod(nameof(Action.Invoke)).ReturnType;
+
+                if (delegateReturnType.IsVoid())
+                {
+                    return null;
+                }
+
+                return delegateReturnType;
+            }
+
+            return null;
+        }
+
+        public static bool IsResultlessTask(this Type type)
+        {
+            if (!type.IsTask())
+                return false;
+
+            return !type.IsGenericType;
         }
     }
 }

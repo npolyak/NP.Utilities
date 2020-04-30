@@ -63,6 +63,16 @@ namespace NP.Utilities
             return (str.Substring(0, idx), str.Substring(idx + separator.Length));
         }
 
+        public static (string firstRegion, string secondRegion, string lastRegion) 
+            SplitIntoThree(this string str, string separator)
+        {
+            (string firstRegion, string remainder) = str.SplitIntoTwo(separator);
+
+            (string secondRegion, string lastRegion) = remainder.SplitIntoTwo(separator);
+
+            return (firstRegion, secondRegion, lastRegion);
+        }
+
         /// splits into 3 regions:
         /// 1. Before the start
         /// 2. [start to end)

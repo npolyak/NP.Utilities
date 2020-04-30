@@ -188,6 +188,21 @@ namespace NP.Utilities
             }
         }
 
+
+        public static void RemoveAllTyped<T>(this ICollection<T> collection)
+        {
+            if (collection == null)
+                return;
+
+            var elements =
+                new List<T>(collection);
+
+            foreach (T el in elements)
+            {
+                collection.Remove(el);
+            }
+        }
+
         public static bool IsNullOrEmpty(this IEnumerable collection)
         {
             if (collection == null)
@@ -296,7 +311,10 @@ namespace NP.Utilities
             return coll.FindItemAndIdx(lookupItem, predicate).Idx;
         }
 
-        public static int IndexOf<T>(this IEnumerable<T> collection, Func<T, bool> f)
+        public static int IndexOf<T>
+        (
+            this IEnumerable<T> collection, 
+            Func<T, bool> f)
         {
             int i = -1;
             foreach(T item in collection)
@@ -311,7 +329,10 @@ namespace NP.Utilities
             return -1;
         }
 
-        public static int LastIndexOf<T>(this IEnumerable<T> collection, Func<T, bool> lastIdxFn)
+        public static int LastIndexOf<T>
+        (
+            this IEnumerable<T> collection, 
+            Func<T, bool> lastIdxFn)
         {
             int i = collection.Count();
             foreach (T item in collection.Reverse())
@@ -326,7 +347,11 @@ namespace NP.Utilities
             return -1;
         }
 
-        public static void InsertAfterLastIndexOf<T>(this IList<T> list, Func<T, bool> lastIdxFn, T itemToInsert)
+        public static void InsertAfterLastIndexOf<T>
+        (
+            this IList<T> list, 
+            Func<T, bool> lastIdxFn, 
+            T itemToInsert)
         {
             int lastIdx = list.LastIndexOf(lastIdxFn);
 
@@ -449,7 +474,11 @@ namespace NP.Utilities
             return obj.ToSingleObjectCollection();
         }
 
-        public static void InsertInOrder<T>(this IList<T> list, T item, Func<T, T, int> comparisonFn)
+        public static void InsertInOrder<T>
+        (
+            this IList<T> list, 
+            T item, 
+            Func<T, T, int> comparisonFn)
         {
             int idx = 0;
             foreach(T listItem in list)
@@ -466,12 +495,24 @@ namespace NP.Utilities
             list.Add(item);
         }
 
-        public static void InsertAllInOrder<T>(this IList<T> list, IEnumerable<T> items, Func<T, T, int> comparisonFn)
+        public static void InsertAllInOrder<T>
+        (
+            this IList<T> list, 
+            IEnumerable<T> items, 
+            Func<T, T, int> comparisonFn)
         {
             if (items == null)
                 return;
 
             items.DoForEach(item => list.InsertInOrder(item, comparisonFn));
+        }
+
+        public static void InsertCollectionAtStart<T>(this IList<T> col, IEnumerable<T> collToInsert)
+        {
+            if (collToInsert == null)
+                return;
+
+            collToInsert.Reverse().DoForEach(item => col.Insert(0, item));
         }
 
         public static void DeleteAllOneByOne(this IList list)
@@ -484,7 +525,10 @@ namespace NP.Utilities
             }
         }
 
-        public static IEnumerable<T> UnionSingle<T>(this IEnumerable<T> collection, params T[] additionalParams)
+        public static IEnumerable<T> UnionSingle<T>
+        (
+            this IEnumerable<T> collection, 
+            params T[] additionalParams)
         {
             return collection.Union(additionalParams);
         }

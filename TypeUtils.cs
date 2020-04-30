@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NP.Utilities
 {
@@ -48,7 +49,7 @@ namespace NP.Utilities
             return type.DeclaringType.NestedTypeToName() + "_" + currentTypeName;
         }
 
-        public static string Box(this string typeStr)
+        private static string UnBoxImpl(this string typeStr, bool unbox = true)
         {
             switch (typeStr)
             {
@@ -75,14 +76,37 @@ namespace NP.Utilities
             return typeStr;
         }
 
+        public static string UnBox(this string typeStr, bool unboxIfNeeded = true)
+        {
+            if (unboxIfNeeded)
+            {
+                return typeStr.UnBoxImpl();
+            }
+
+            return typeStr;
+        }
+
+
+
+        public static string GetTypeNameWithUnboxing(this Type type)
+        {
+            if (type == typeof(object))
+                return "object";
+
+            return type?.Name;
+        }
+
         // include the generic params
         public static string GetFullTypeName(this Type type, Func<Type, string> typeToStr = null)
         {
+            if (type == null)
+                return null;
+
             if(typeToStr == null)
             {
                 typeToStr = (t) => t.GetTypeName();
             }
-            string result = typeToStr(type).Box();
+            string result = typeToStr(type).UnBoxImpl();
 
             if (type.IsGenericType)
             {
@@ -100,7 +124,7 @@ namespace NP.Utilities
                         firstIteration = false;
                     }
 
-                    result += typeParam.GetFullTypeName(typeToStr).Box();
+                    result += typeParam.GetFullTypeName(typeToStr).UnBoxImpl();
                 }
                 result += ">";
             }
@@ -199,26 +223,6 @@ namespace NP.Utilities
             return str;
         }
 
-        public static Type GetInnermostGenericTypeParam(this Type type)
-        {
-            if (type == null)
-                return null;
-
-            if (type.IsGenericParameter)
-                return type;
-
-            if (type.IsGenericType)
-            {
-                Type genericArg = type.GetGenericArguments().FirstOrDefault();
-
-                if (genericArg == null)
-                    return type;
-
-                return genericArg.GetInnermostGenericTypeParam();
-            }
-
-            return type;
-        }
 
         public static bool IsCollection(this Type type)
         {
@@ -241,6 +245,29 @@ namespace NP.Utilities
                 type.GenericTypeArguments.First();
 
             return argType;
+        }
+
+        public static Type GetTaskTypeIfTask(this Type type)
+        {
+            if (!type.IsTask())
+                return type;
+
+            Type argType =
+                type.GenericTypeArguments.FirstOrDefault();
+
+            return argType ?? type;
+        }
+
+        public static async Task<object> GetTaskResultIfTask(this object result)
+        {
+            if (result is Task t)
+            {
+                await t;
+
+                result = t.GetPropValue("Result");
+            }
+
+            return result;
         }
     }
 }

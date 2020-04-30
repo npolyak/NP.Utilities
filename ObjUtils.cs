@@ -166,5 +166,21 @@ namespace NP.Utilities
 
             return (TTarget)source;
         }
+
+        public static T[] GetEnumVals<T>()
+            where T : struct
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>().OrderBy(v => v).ToArray();
+        }
+
+        public static (T, T) Swap<T>(this (T Item1, T Item2) pair, bool shouldSwap = true)
+        {
+            if (shouldSwap)
+            {
+                return (pair.Item2, pair.Item1);
+            }
+
+            return (pair.Item1, pair.Item2);
+        }
     }
 }

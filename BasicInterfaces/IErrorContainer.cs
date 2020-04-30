@@ -6,4 +6,9 @@
 
         bool HasError => ErrorMsg != null;
     }
+
+    public interface IErrorSetter
+    {
+        protected void SetErrorMsg(string errorMsg);
+    }
 }

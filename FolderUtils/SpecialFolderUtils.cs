@@ -6,5 +6,8 @@ namespace NP.Utilities.FolderUtils
     {
         public static string AppDataDir { get; } =
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+
+        public static string UserAppDataDir { get; } =
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     }
 }

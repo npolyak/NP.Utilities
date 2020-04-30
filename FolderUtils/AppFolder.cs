@@ -8,13 +8,21 @@
 
         public string Extension { get; }
 
-        public AppFolderUtils(string pathWithRespectToAppDir, string extension = "xml")
+        public AppFolderUtils
+        (
+            string pathWithRespectToAppDir, 
+            string extension = "xml",
+            bool isPerUser = false)
         {
             PathWithRespectToAppDir = pathWithRespectToAppDir;
 
             Extension = extension;
 
-            FullBasePath = SpecialFolderUtils.AppDataDir.AddPath(PathWithRespectToAppDir);
+            FullBasePath = 
+                isPerUser ? 
+                    SpecialFolderUtils.UserAppDataDir.AddPath(PathWithRespectToAppDir)
+                    :
+                    SpecialFolderUtils.AppDataDir.AddPath(PathWithRespectToAppDir);
 
             FullBasePath.CreateDirIfDoesNotExist();
         }
