@@ -144,6 +144,17 @@ namespace NP.Utilities
             }
         }
 
+        public static (T, int) FindMatching<T, TKey>
+        (
+            this IEnumerable<T> collection,
+            T item,
+            Func<T, TKey> itemToKey
+        )
+        {
+            var valToCompare = itemToKey(item);
+            return collection.Select((v, idx) => (v, idx)).FirstOrDefault(val => itemToKey(val.v).ObjEquals(valToCompare));
+        }
+
         public static void RemoveMatching<T, LookupType>
         (
             this ICollection<T> collection,
@@ -374,6 +385,18 @@ namespace NP.Utilities
             collection.Add(elementToAdd);
         }
 
+        public static void AddIfNotThereSimple<T>(
+            this IList<T> collection,
+            T elementToAdd)
+        {
+            collection.AddIfNotThere(elementToAdd);
+        }
+
+        public static void RemoveItem<T>(this IList<T> collection, T elementToRemove)
+        {
+            collection.Remove(elementToRemove);
+        }
+
         public static void AddRangeIfNotThere<T>
         (
             this IList<T> collection,
@@ -474,16 +497,17 @@ namespace NP.Utilities
             return obj.ToSingleObjectCollection();
         }
 
-        public static void InsertInOrder<T>
+        public static void InsertInOrder<T, TKey>
         (
             this IList<T> list, 
             T item, 
-            Func<T, T, int> comparisonFn)
+            Func<T, TKey> keyGetter,
+            Func<TKey, TKey, int> comparisonFn)
         {
             int idx = 0;
             foreach(T listItem in list)
             {
-                if (comparisonFn(listItem, item) >= 0)
+                if (comparisonFn(keyGetter(listItem), keyGetter(item)) >= 0)
                 {
                     list.Insert(idx, item);
                     return;
@@ -495,16 +519,36 @@ namespace NP.Utilities
             list.Add(item);
         }
 
-        public static void InsertAllInOrder<T>
+
+        public static void InsertInOrder<T>
+        (
+            this IList<T> list,
+            T item,
+            Func<T, T, int> comparisonFn)
+        {
+            list.InsertInOrder<T, T>(item, v => v, comparisonFn);
+        }
+
+        public static void InsertAllInOrder<T, TKey>
         (
             this IList<T> list, 
-            IEnumerable<T> items, 
-            Func<T, T, int> comparisonFn)
+            IEnumerable<T> items,
+            Func<T, TKey> keyGetter,
+            Func<TKey, TKey, int> comparisonFn)
         {
             if (items == null)
                 return;
 
-            items.DoForEach(item => list.InsertInOrder(item, comparisonFn));
+            items.DoForEach(item => list.InsertInOrder(item, keyGetter, comparisonFn));
+        }
+
+        public static void InsertAllInOrder<T>
+        (
+            this IList<T> list,
+            IEnumerable<T> items,
+            Func<T, T, int> comparisonFn)
+        {
+            list.InsertAllInOrder<T, T>(items, v => v, comparisonFn);
         }
 
         public static void InsertCollectionAtStart<T>(this IList<T> col, IEnumerable<T> collToInsert)
@@ -531,6 +575,42 @@ namespace NP.Utilities
             params T[] additionalParams)
         {
             return collection.Union(additionalParams);
+        }
+
+        public static void InsertUpdateOrRemove<T>
+        (
+            this IList<T> collection, 
+            T item,
+            Func<IEnumerable<T>, T, (T, int)> getMatchingItemAndIdxFn,
+            Func<T, bool> shouldRemoveFn,
+            Action<T, T> updateFn,
+            Action<IList<T>, T> insertFn
+        )
+        {
+            if (collection == null)
+                return;
+
+            (T matchingItem, int matchingItemIdx) = getMatchingItemAndIdxFn(collection, item);
+
+            bool shouldRemove = shouldRemoveFn(item);
+
+            if (matchingItemIdx < 0 && !shouldRemove) // item not found, so it is an insert
+            {
+                insertFn(collection, item);
+                return;
+            }
+
+            if (shouldRemove)
+            {
+                collection.RemoveAt(matchingItemIdx);
+                return;
+            }
+
+            // matching item found and it should not be removed, so it should be updated:
+            // this will not work if the collection items are value types (in that case, 
+            // we would have to update a reference or remove and insert, but most of the cases will be 
+            // covered by the update below. 
+            updateFn(matchingItem, item);
         }
     }
 }

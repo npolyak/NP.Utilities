@@ -259,8 +259,7 @@ namespace NP.Utilities
             propInfo.SetValue(obj, val, null);
         }
 
-
-        public static object CallMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
+        public static MethodInfo GetMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic)
         {
             BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, isStatic);
 
@@ -275,6 +274,14 @@ namespace NP.Utilities
             }
 
             MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);
+
+            return methodInfo;
+        }
+
+
+        public static object CallMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
+        {
+            MethodInfo methodInfo = obj.GetMethod(methodName, includeNonPublic, isStatic);
 
             return methodInfo.Invoke(obj, args);
         }
@@ -633,6 +640,46 @@ namespace NP.Utilities
                     }
                 }
             }
+            else if (type.IsArray)
+            {
+                Type elementType = type.GetElementType();
+
+                foreach(var genericSubTypeParam in elementType.GetAllGenericTypeParams())
+                {
+                    yield return genericSubTypeParam;
+                }
+            }
+        }
+
+        /// <summary>
+        /// e.g. for IEnumerable&lt;int&gt; returns a collection of two items 
+        /// containing typeof(IEnumerable<>) and typeof(int)
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetAllGenericSubTypes(this Type type)
+        {
+            if (type == null)
+                yield break;
+
+            if (type.IsGenericParameter)
+                yield return type;
+
+            if (type.IsGenericType)
+            {
+                foreach (var genericArg in type.GetGenericArguments())
+                {
+                    foreach (var genericSubTypeParam in genericArg.GetAllGenericSubTypes())
+                    {
+                        yield return genericSubTypeParam;
+                    }
+                }
+                yield return type.GetGenericTypeDefinition();
+            }
+            else
+            {
+                yield return type;
+            }
         }
 
         public static bool IsConcrete(this Type type)
@@ -669,7 +716,7 @@ namespace NP.Utilities
                 ConstructorInfo constrInfo = 
                     concreteType.GetConstructor(new Type[] { });
 
-                if (constrInfo != null)
+                if (constrInfo == null)
                     return false;
             }
 
@@ -679,12 +726,9 @@ namespace NP.Utilities
             if (constraintTypes == null)
                 return true;
 
-            Type[] concreteTypeSuperTypes =
-                concreteType.GetSelfSuperTypesAndInterfaces().Distinct().ToArray();
-
             foreach (Type constraintType in constraintTypes)
             {
-                if (!concreteTypeSuperTypes.Contains(constraintType))
+                if ( !concreteType.ResolveType(constraintType, constraintType.GetFromGenericType()))
                 {
                     return false;
                 }

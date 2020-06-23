@@ -240,5 +240,10 @@ namespace NP.Utilities
         {
             return (TEnum)Enum.Parse(typeof(TEnum), str);
         }
+
+        public static int ToInt(this string str)
+        {
+            return int.Parse(str);
+        }
     }
 }

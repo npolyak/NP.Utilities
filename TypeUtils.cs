@@ -71,6 +71,8 @@ namespace NP.Utilities
                     return "char";
                 case "Void":
                     return "void";
+                case "Object":
+                    return "object";
             }
 
             return typeStr;
