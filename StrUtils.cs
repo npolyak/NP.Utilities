@@ -63,6 +63,38 @@ namespace NP.Utilities
             return (str.Substring(0, idx), str.Substring(idx + separator.Length));
         }
 
+        public static string ReverseStr(this string str)
+        {
+            return new string(str.Reverse().ToArray());
+        }
+
+        public static (string firstRegion, string lastRegion) SplitIntoTwo
+        (
+            this string str, 
+            Func<char, bool> splitConditionFunc, 
+            bool fromBeginningOrEnd = true)
+        {
+            int len = str.Length;
+
+            string strToCheckCondition = fromBeginningOrEnd ? str : str.ReverseStr();
+
+            int i = 0;
+            for (; i < len; i++)
+            {
+                if (splitConditionFunc(strToCheckCondition[i]))
+                {
+                    break;
+                }
+            }
+
+            if (!fromBeginningOrEnd)
+            {
+                i = len - i;
+            }
+
+            return (str.Substring(0, i), str.Substring(i));
+        }
+
         public static (string firstRegion, string secondRegion, string lastRegion) 
             SplitIntoThree(this string str, string separator)
         {

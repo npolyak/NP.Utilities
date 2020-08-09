@@ -602,7 +602,10 @@ namespace NP.Utilities
 
             if (shouldRemove)
             {
-                collection.RemoveAt(matchingItemIdx);
+                if (matchingItemIdx >= 0)
+                {
+                    collection.RemoveAt(matchingItemIdx);
+                }
                 return;
             }
 
