@@ -160,16 +160,16 @@ namespace NP.Utilities
 
         public static Type GetMethodArgType
         (
-            this Type type, 
-            string methodName, 
+            this Type type,
+            string methodName,
             int argIdx = 0,
             bool includeNonPublic = false
         )
         {
-            MethodInfo methodInfo = 
+            MethodInfo methodInfo =
                 type.GetMethodInfoFromType(methodName, includeNonPublic);
 
-            ParameterInfo[] parameters = 
+            ParameterInfo[] parameters =
                 methodInfo.GetParameters();
 
             if (argIdx >= parameters.Length)
@@ -186,7 +186,7 @@ namespace NP.Utilities
         (
             this object obj,
             string fieldName,
-            bool includeNonPublic = true, 
+            bool includeNonPublic = true,
             Type realType = null)
         {
             if (realType == null)
@@ -198,8 +198,8 @@ namespace NP.Utilities
 
         public static PropertyInfo GetPropInfo
         (
-            this object obj, 
-            string propName, 
+            this object obj,
+            string propName,
             bool includeNonPublic = false)
         {
             PropertyInfo sourcePropInfo = obj.GetType().GetPropInfoFromType(propName, includeNonPublic);
@@ -216,13 +216,13 @@ namespace NP.Utilities
         {
             FieldInfo fieldInfo = obj.GetFieldInfo(fieldName, includeNonPublic, realType);
 
-            return (T) fieldInfo.GetValue(obj);
+            return (T)fieldInfo.GetValue(obj);
         }
 
         public static object GetPropValue
         (
-            this object obj, 
-            string propName, 
+            this object obj,
+            string propName,
             bool includeNonPublic = false)
         {
             PropertyInfo propInfo = obj.GetPropInfo(propName, includeNonPublic);
@@ -232,7 +232,7 @@ namespace NP.Utilities
 
         public static T GetPropValue<T>
         (
-            this object obj, 
+            this object obj,
             string propName,
             bool includeNonPublic = false)
         {
@@ -241,9 +241,9 @@ namespace NP.Utilities
 
         public static void SetFieldValue
         (
-            this object obj, 
-            string fieldName, 
-            object val, 
+            this object obj,
+            string fieldName,
+            object val,
             bool includeNonPublic = true,
             Type realType = null)
         {
@@ -259,7 +259,7 @@ namespace NP.Utilities
             propInfo.SetValue(obj, val, null);
         }
 
-        public static MethodInfo GetMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic)
+        public static MethodInfo GetMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params Type[] argTypes)
         {
             BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, isStatic);
 
@@ -273,19 +273,30 @@ namespace NP.Utilities
                 type = obj.GetType();
             }
 
-            MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);
+            var methodInfos = type.GetMember(methodName, bindingFlags).OfType<MethodInfo>().ToList();
 
-            return methodInfo;
+            return methodInfos.FirstOrDefault(mInfo => mInfo.IsMethodCompatibleWithInputArgs(argTypes));
         }
 
+        public static bool IsMethodCompatibleWithInputArgs(this MethodInfo method, params Type[] argTypes)
+        {
+            bool parametersEqual = 
+                argTypes.SequenceEqual(method.GetParameters().Select(x => x.ParameterType));
+
+            return parametersEqual;
+        }
 
         public static object CallMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
         {
-            MethodInfo methodInfo = obj.GetMethod(methodName, includeNonPublic, isStatic);
+            MethodInfo methodInfo = obj.GetMethod(methodName, includeNonPublic, isStatic, args.Select(arg => arg.GetType()).ToArray());
 
             return methodInfo.Invoke(obj, args);
         }
 
+        public static object CallMethod(this object obj, string methodName, params object[] args)
+        {
+            return CallMethod(obj, methodName, false, false, args);
+        }
 
         public static T GetCompoundPropValue<T>
         (
