@@ -1,5 +1,5 @@
 ﻿// (c) Nick Polyak 2018 - http://awebpros.com/
-// License: Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html)
+// License: MIT License (https://opensource.org/licenses/MIT)
 //
 // short overview of copyright rules:
 // 1. you can use this framework in any commercial or non-commercial 
