@@ -15,7 +15,7 @@ namespace NP.Utilities
         {
             string ending = str.SubstrFromTo(UNDERSCORE, null, false);
 
-            if (ending.IsNullOrWhiteSpace())
+            if (ending.IsStrNullOrWhiteSpace())
             {
                 return 0;
             }

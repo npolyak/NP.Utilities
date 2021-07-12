@@ -28,6 +28,8 @@ namespace NP.Utilities
         public const string PLAIN_PROP_PATH_LINK_SEPARATOR = ".";
         public const char BINDING_PATH_LINK_SEPARATOR = '/';
 
+        public readonly static char[] WHITESPACE_CHARS = { ' ', '\n', '\t', '\r' };
+
         public static string NullToEmpty(this string str)
         {
             return str ?? string.Empty;
@@ -220,7 +222,7 @@ namespace NP.Utilities
             return result;
         }
 
-        public static bool IsNullOrWhiteSpace(this string str)
+        public static bool IsStrNullOrWhiteSpace(this string str)
         {
             return string.IsNullOrWhiteSpace(str);
         }
