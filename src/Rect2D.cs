@@ -48,5 +48,11 @@ namespace NP.Utilities
 
             return (rect, pt1.Minus(startPoint), pt2.Minus(startPoint));
         }
+
+        public static bool IsPointInside(this Rect2D rect, Point2D pt)
+        {
+            return pt.GreaterOrEqual(rect.StartPoint).All &&
+                pt.LessOrEqual(rect.EndPoint).All;
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace NP.Utilities
 
         protected void OnPropertyChanged(string propName)
         {
-            this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
     }
 }
