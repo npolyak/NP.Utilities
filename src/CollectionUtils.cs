@@ -569,6 +569,16 @@ namespace NP.Utilities
             }
         }
 
+        public static void RemoveAllOneByOne<T>(this IList<T> list)
+        {
+            List<T> arrayList = new List<T>(list);
+
+            foreach (var item in arrayList)
+            {
+                list.Remove(item);
+            }
+        }
+
         public static IEnumerable<T> UnionSingle<T>
         (
             this IEnumerable<T> collection, 

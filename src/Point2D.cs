@@ -118,6 +118,9 @@ namespace NP.Utilities
         public static Point2D Max(this Point2D pt1, Point2D pt2) =>
             pt1.Transform(pt2, Math.Max);
 
+        public static Point2D Plus(this Point2D pt1, Point2D pt2) =>
+            pt1.Transform(pt2, (num1, num2) => num1 + num2);
+
         public static Point2D Minus(this Point2D pt1, Point2D pt2) =>
             pt1.Transform(pt2, (num1, num2) => num1 - num2);
 
