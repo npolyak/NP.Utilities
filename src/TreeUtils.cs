@@ -108,14 +108,15 @@ namespace NP.Utilities
             this IEnumerable<NodeType> nodeTypeCollection,
             NodeType parentNode,
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction,
-            int level
+            int level,
+            Func<NodeType, bool> stopCondition = null
         )
         {
             if (nodeTypeCollection != null)
             {
                 foreach (NodeType child in nodeTypeCollection)
                 {
-                    foreach (TreeNodeInfo<NodeType> descendantNode in child.SelfAndDescendantsWithLevelInfo(parentNode, toChildrenFunction, level))
+                    foreach (TreeNodeInfo<NodeType> descendantNode in child.SelfAndDescendantsWithLevelInfo(parentNode, toChildrenFunction, level, stopCondition))
                     {
                         yield return descendantNode;
                     }
@@ -140,18 +141,22 @@ namespace NP.Utilities
         public static IEnumerable<TreeNodeInfo<NodeType>> SelfAndDescendantsWithLevelInfo<NodeType>
         (
             this NodeType node,
-            NodeType parentNode, 
+            NodeType parentNode,
             Func<NodeType, IEnumerable<NodeType>> toChildrenFunction,
-            int level = 0
+            int level = 0,
+            Func<NodeType, bool> stopCondition = null
         )
         {
             if (node != null)
             {
                 yield return new TreeNodeInfo<NodeType>(parentNode, node, level);
 
+                if (stopCondition?.Invoke(node) == true)
+                    yield break;
+
                 IEnumerable<NodeType> children = toChildrenFunction(node);
 
-                foreach (TreeNodeInfo<NodeType> descendant in children.CollectionDescendants(node, toChildrenFunction, level + 1))
+                foreach (TreeNodeInfo<NodeType> descendant in children.CollectionDescendants(node, toChildrenFunction, level + 1, stopCondition))
                 {
                     yield return descendant;
                 }
@@ -185,10 +190,11 @@ namespace NP.Utilities
         public static IEnumerable<NodeType> SelfAndDescendants<NodeType>
         (
             this NodeType node,
-            Func<NodeType, IEnumerable<NodeType>> toChildrenFunction
+            Func<NodeType, IEnumerable<NodeType>> toChildrenFunction,
+            Func<NodeType, bool> stopCondition = null
         )
         {
-            return node.SelfAndDescendantsWithLevelInfo(default, toChildrenFunction).Select((treeChildInfo) => treeChildInfo.Node);
+            return node.SelfAndDescendantsWithLevelInfo(default, toChildrenFunction, 0, stopCondition).Select((treeChildInfo) => treeChildInfo.Node);
         }
 
         public static IEnumerable<ResultType> SelfAndDescendants<NodeType, ResultType>
