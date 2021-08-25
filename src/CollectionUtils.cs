@@ -171,7 +171,7 @@ namespace NP.Utilities
             }
         }
 
-        public static void RemoveAll
+        public static void DeleteAll
         (
             this IList collection, 
             IEnumerable itemsToRemove)
@@ -180,6 +180,20 @@ namespace NP.Utilities
                 return;
 
             foreach(object itemToRemove in itemsToRemove)
+            {
+                collection.Remove(itemToRemove);
+            }
+        }
+
+        public static void RemoveAll<T>
+        (
+            this IList<T> collection,
+            IEnumerable<T> itemsToRemove)
+        {
+            if (itemsToRemove == null)
+                return;
+
+            foreach (T itemToRemove in itemsToRemove)
             {
                 collection.Remove(itemToRemove);
             }
