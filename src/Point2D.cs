@@ -70,16 +70,38 @@ namespace NP.Utilities
 
         public Point2D(string str)
         {
+            this.SetFromStr(str);
+        }
+
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
+        }
+    }
+
+    public static class Point2DHelper
+    {
+        public static void SetFromStr(this Point2D p, string str)
+        {
             string[] split =
                 str.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (split.Count() != 2)
-                return;
+                throw new Exception($"Format Error: Cannot parse string '{str}' as Point2D");
 
-            X = double.Parse(split[0]);
-            Y = double.Parse(split[1]);
+
+            p.X = double.Parse(split[0]);
+            p.Y = double.Parse(split[1]);
         }
 
+        public static Point2D ParseToPoint2D(this string str)
+        {
+            Point2D p = new Point2D();
+
+            SetFromStr(p, str);
+
+            return p;
+        }
     }
 
     public class BoolPoint2D : Point2D<bool>

@@ -23,10 +23,7 @@ namespace NP.Utilities
         {
             IPreSaveable saveable = objToSerialize as IPreSaveable;
 
-            if (saveable != null)
-            {
-                saveable.BeforeSave();
-            }
+            saveable?.BeforeSave();
 
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
 
