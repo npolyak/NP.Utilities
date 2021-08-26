@@ -22,9 +22,11 @@ namespace NP.Utilities
 
         // assumes that str ends with _<number>
         // if not - number returned is 0
-        private static int GetEndNumber(this string str)
+        private static int GetEndNumber(this string str, bool uniqueNumberAdded)
         {
-            string ending = str.SubstrFromTo(UNDERSCORE, null, false);
+
+            string end = uniqueNumberAdded ? "_" : null;
+            string ending = str.SubstrFromTo(UNDERSCORE, end, false);
 
             if (ending.IsStrNullOrWhiteSpace())
             {
@@ -41,20 +43,27 @@ namespace NP.Utilities
 
         // generate the number after the max number assuming that 
         // the names end with _<number>
-        public static int GenerateUniqueNumber(this IEnumerable<string> names)
+        public static int GenerateUniqueNumber(this IEnumerable<string> names, bool uniqueNumberAdded)
         {
             int maxNumber = 0;
 
-            IEnumerable<int> allNumbers = names.Select(name => name.GetEndNumber()).ToList();
+            IEnumerable<int> allNumbers = names.Select(name => name.GetEndNumber(uniqueNumberAdded)).ToList();
             if (allNumbers.Count() > 0)
                 maxNumber = allNumbers.Max();
 
             return maxNumber + 1;
         }
 
-        public static string GetUniqueName(this IEnumerable<string> names, string prefix)
+        public static string GetUniqueName(this IEnumerable<string> names, string prefix, bool addUniqueNumber = false)
         {
-            return $"{prefix}{UNDERSCORE}{names.GenerateUniqueNumber()}";
+            string result = $"{prefix}{UNDERSCORE}{names.GenerateUniqueNumber(addUniqueNumber)}";
+
+            if (addUniqueNumber)
+            {
+                result = $"{result}_{UniqueNumberGenerator.Generate()}";
+            }
+
+            return result;
         }
     }
 }
