@@ -77,6 +77,11 @@ namespace NP.Utilities
         {
             return $"({X}, {Y})";
         }
+
+        public double AbsSquared()
+        {
+            return X * X + Y * Y;
+        }
     }
 
     public static class Point2DHelper
