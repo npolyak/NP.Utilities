@@ -25,7 +25,7 @@ namespace NP.Utilities
         private static int GetEndNumber(this string str, bool uniqueNumberAdded)
         {
 
-            string end = uniqueNumberAdded ? "_" : null;
+            string end = uniqueNumberAdded ? "." : null;
             string ending = str.SubstrFromTo(UNDERSCORE, end, false);
 
             if (ending.IsStrNullOrWhiteSpace())
@@ -60,7 +60,7 @@ namespace NP.Utilities
 
             if (addUniqueNumber)
             {
-                result = $"{result}_{UniqueNumberGenerator.Generate()}";
+                result = $"{result}.{UniqueNumberGenerator.Generate()}";
             }
 
             return result;
