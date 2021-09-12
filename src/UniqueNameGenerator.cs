@@ -54,16 +54,31 @@ namespace NP.Utilities
             return maxNumber + 1;
         }
 
-        public static string GetUniqueName(this IEnumerable<string> names, string prefix, bool addUniqueNumber = false)
+        public static (string uniqueName, int maxNumber) GetUniqueNameAndMaxNumber
+        (
+            this IEnumerable<string> names, 
+            string prefix, 
+            int maxNumber = -1,
+            bool addUniqueNumber = false)
         {
-            string result = $"{prefix}{UNDERSCORE}{names.GenerateUniqueNumber(addUniqueNumber)}";
+            maxNumber = Math.Max(names.GenerateUniqueNumber(addUniqueNumber), maxNumber + 1);
+            string result = $"{prefix}{UNDERSCORE}{maxNumber}";
 
             if (addUniqueNumber)
             {
                 result = $"{result}.{UniqueNumberGenerator.Generate()}";
             }
 
-            return result;
+            return (result, maxNumber);
+        }
+
+        public static string GetUniqueName
+        (
+            this IEnumerable<string> names,
+            string prefix,
+            bool addUniqueNumber = false)
+        {
+            return names.GetUniqueNameAndMaxNumber(prefix, -1, addUniqueNumber).uniqueName;
         }
     }
 }
