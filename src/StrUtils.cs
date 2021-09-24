@@ -269,6 +269,8 @@ namespace NP.Utilities
 
         public static void Throw(this string str) => throw new Exception(str);
 
+        public static void ThrowProgError(this string str) => throw new ProgrammingError(str);
+
         public static TEnum Parse<TEnum>(this string str)
             where TEnum : struct
         {
@@ -279,5 +281,6 @@ namespace NP.Utilities
         {
             return int.Parse(str);
         }
+
     }
 }
