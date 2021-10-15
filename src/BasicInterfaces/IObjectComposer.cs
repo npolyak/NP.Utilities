@@ -2,6 +2,9 @@
 {
     public interface IObjectComposer
     {
-        void ComposeObject(object obj, bool ifCompositionNotNull = false);
+        void ComposeObject
+        (
+            object obj, 
+            bool ifCompositionNotNull = false);
     }
 }
