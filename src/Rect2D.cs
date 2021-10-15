@@ -37,6 +37,11 @@ namespace NP.Utilities
         {
             return $"{{{StartPoint}, {EndPoint}}}";
         }
+
+        public static Point2D Parse(string s)
+        {
+            return null;
+        }
     }
 
     public static class Rect2DUtils
