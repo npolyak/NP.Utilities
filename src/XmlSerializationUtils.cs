@@ -10,6 +10,7 @@
 // products that use it.
 //
 using NP.Utilities.BasicInterfaces;
+using System;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -19,13 +20,13 @@ namespace NP.Utilities
 {
     public static class XmlSerializationUtils
     {
-        public static string Serialize<T>(this T objToSerialize)
+        public static string Serialize<T>(this T objToSerialize, params Type[] extraTypes)
         {
             IPreSaveable saveable = objToSerialize as IPreSaveable;
 
             saveable?.BeforeSave();
 
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T), extraTypes);
 
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -45,14 +46,25 @@ namespace NP.Utilities
             return stringBuilder.ToString().ReplaceEncoding();
         }
 
-        public static T Deserialize<T>(string xmlStr)
+        public static void SerializeToFile<T>(this T objToSerialize, string filePath, params Type[] extraTypes)
+        {
+            string serializationStr = objToSerialize.Serialize<T>(extraTypes);
+
+            using StreamWriter writer = new StreamWriter(filePath);
+
+            writer.Write(serializationStr);
+
+            writer.Flush();
+        }
+
+        public static T Deserialize<T>(string xmlStr, params Type[] extraTypes)
         {
             if (xmlStr.IsNullOrEmpty())
             {
                 return default(T);
             }
 
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T), extraTypes);
 
             using (StringReader stringReader = new StringReader(xmlStr))
             {
@@ -67,6 +79,15 @@ namespace NP.Utilities
 
                 return result;
             }
+        }
+
+        public static T DeserializeFromFile<T>(string filePath, params Type[] extraTypes)
+        {
+            using StreamReader reader = new StreamReader(filePath);
+
+            string serializationStr = reader.ReadToEnd();
+
+            return Deserialize<T>(serializationStr, extraTypes);
         }
 
         static string ReplaceEncoding(this string str)
