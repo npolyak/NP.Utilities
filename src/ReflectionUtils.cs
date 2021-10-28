@@ -278,12 +278,14 @@ namespace NP.Utilities
             return methodInfos.FirstOrDefault(mInfo => mInfo.IsMethodCompatibleWithInputArgs(argTypes));
         }
 
-        public static bool IsMethodCompatibleWithInputArgs(this MethodInfo method, params Type[] argTypes)
+        public static bool IsMethodCompatibleWithInputArgs(this MethodInfo method, params Type[] argRealTypes)
         {
-            bool parametersEqual = 
-                argTypes.SequenceEqual(method.GetParameters().Select(x => x.ParameterType));
+            Type[] methodParamTypes = method.GetParameters().Select(x => x.ParameterType).ToArray();
 
-            return parametersEqual;
+            if (methodParamTypes.Length != argRealTypes.Length)
+                return false;
+
+            return methodParamTypes.Zip(argRealTypes).All(item => item.First.IsAssignableFrom(item.Second));
         }
 
         public static object CallMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
