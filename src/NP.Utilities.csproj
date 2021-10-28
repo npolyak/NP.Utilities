@@ -6,6 +6,7 @@
     <Version>1.0.5</Version>
     <Authors>Nick Polyak</Authors>
     <Company>AWebPros</Company>
+    <Description>Contains the basic utility functionality</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 </Project>
