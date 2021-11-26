@@ -10,6 +10,8 @@
 // products that use it.
 //
 using System;
+using System.Globalization;
+using System.Linq;
 
 namespace NP.Utilities
 {
@@ -113,6 +115,42 @@ namespace NP.Utilities
             }
 
             return angleAfter;
+        }
+
+        public static double Max(params double[] vals )
+        {
+            if (vals.IsNullOrEmpty())
+            {
+                return double.NegativeInfinity;
+            }
+
+            return vals.Max();
+        }
+
+
+        public static double Min(params double[] vals)
+        {
+            if (vals.IsNullOrEmpty())
+            {
+                return double.PositiveInfinity;
+            }
+
+            return vals.Min();
+        }
+
+        public static bool AlmostEquals(this double d1, double d2)
+        {
+            return Math.Abs(d1 - d2) < 0.00000001;
+        }
+
+        public static string ToHex(this int i)
+        {
+            return i.ToString("X");
+        }
+
+        public static int ParseHex(this string hex)
+        {
+            return int.Parse(hex, NumberStyles.HexNumber);
         }
     }
 }

@@ -282,5 +282,14 @@ namespace NP.Utilities
             return int.Parse(str);
         }
 
+        public static string ToFixed(this double number, uint numberDecimals)
+        {
+            return number.ToString("N" + numberDecimals);
+        }
+
+        public static string ToFixed(this float number, uint numberDecimals)
+        {
+            return ((double)number).ToFixed(numberDecimals);
+        }
     }
 }
