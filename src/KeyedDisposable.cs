@@ -6,7 +6,7 @@ namespace NP.Utilities
     {
         public TKey Key { get; set; }
 
-        public IDisposable? Disposable { get; set; }
+        public IDisposable Disposable { get; set; }
 
         public void Dispose()
         {
@@ -14,7 +14,7 @@ namespace NP.Utilities
             Disposable = null;
         }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             if (obj is KeyedDisposable<TKey> keyedDisposable)
                 return this.Key.ObjEquals(keyedDisposable.Key);

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <PackageId>NP.Utilities</PackageId>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Authors>Nick Polyak</Authors>
     <Company>AWebPros</Company>
     <Description>Contains the basic utility functionality</Description>
