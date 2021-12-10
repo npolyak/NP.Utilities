@@ -152,5 +152,15 @@ namespace NP.Utilities
         {
             return int.Parse(hex, NumberStyles.HexNumber);
         }
+
+        public static double ToDouble(this string valStr, string varNameForErrorReporting)
+        {
+            if (!double.TryParse(valStr, out double d))
+            {
+                $"{varNameForErrorReporting} is '{valStr}' cannot be converted to a double".ThrowProgError();
+            }
+
+            return d;
+        }
     }
 }

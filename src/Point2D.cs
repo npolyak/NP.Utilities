@@ -10,12 +10,14 @@
 // products that use it.
 //
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 
 namespace NP.Utilities
 {
     public class Point2D<T>
+        where T : IComparable<T>
     {
         [XmlAttribute]
         public T X { get; set; } = default;
@@ -55,6 +57,7 @@ namespace NP.Utilities
         }
     }
 
+    [TypeConverter(typeof(Point2DTypeConverter))]
     public class Point2D : Point2D<double>
     {
         public Point2D()
@@ -84,6 +87,7 @@ namespace NP.Utilities
         }
     }
 
+
     public static class Point2DHelper
     {
         public static void SetFromStr(this Point2D p, string str)
@@ -107,6 +111,11 @@ namespace NP.Utilities
 
             return p;
         }
+    }
+
+    public static class IntPoint2D
+    {
+
     }
 
     public class BoolPoint2D : Point2D<bool>
@@ -156,31 +165,36 @@ namespace NP.Utilities
             return new Point2D(Math.Abs(pt.X), Math.Abs(pt.Y));
         }
 
-        private static BoolPoint2D ComparePoints(this Point2D p1, Point2D p2, Func<double, double, bool> compareFn)
+        private static BoolPoint2D ComparePoints<T>(this Point2D<T> p1, Point2D<T> p2, Func<T, T, bool> compareFn)
+            where T : IComparable<T>
         {
             return new BoolPoint2D(compareFn(p1.X, p2.X), compareFn(p1.Y, p2.Y));
         }
 
-        public static BoolPoint2D Less(this Point2D p1, Point2D p2)
+        public static BoolPoint2D Less<T>(this Point2D<T> p1, Point2D<T> p2)
+            where T : IComparable<T>
         {
-            return p1.ComparePoints(p2, (d1, d2) => d1 < d2);
+            return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) < 0);
         }
 
-        public static BoolPoint2D LessOrEqual(this Point2D p1, Point2D p2)
+        public static BoolPoint2D LessOrEqual<T>(this Point2D<T> p1, Point2D<T> p2)
+            where T : IComparable<T>
         {
-            return p1.ComparePoints(p2, (d1, d2) => d1 <= d2);
-        }
-
-
-        public static BoolPoint2D Greater(this Point2D p1, Point2D p2)
-        {
-            return p1.ComparePoints(p2, (d1, d2) => d1 > d2);
+            return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) <= 0);
         }
 
 
-        public static BoolPoint2D GreaterOrEqual(this Point2D p1, Point2D p2)
+        public static BoolPoint2D Greater<T>(this Point2D<T> p1, Point2D<T> p2)
+            where T : IComparable<T>
         {
-            return p1.ComparePoints(p2, (d1, d2) => d1 >= d2);
+            return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) > 0);
+        }
+
+
+        public static BoolPoint2D GreaterOrEqual<T>(this Point2D<T> p1, Point2D<T> p2)
+            where T : IComparable<T>
+        {
+            return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) >= 0);
         }
     }
 }
