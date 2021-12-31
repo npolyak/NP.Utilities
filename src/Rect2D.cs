@@ -64,5 +64,10 @@ namespace NP.Utilities
             return pt.GreaterOrEqual(rect.StartPoint).All &&
                 pt.LessOrEqual(rect.EndPoint).All;
         }
+
+        public static Point2D GetSize(this Rect2D rect, double scale = 1d)
+        {
+            return new Point2D(rect.Width * scale, rect.Height * scale);
+        }
     }
 }
