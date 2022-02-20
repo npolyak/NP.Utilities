@@ -16,7 +16,7 @@ namespace NP.Utilities.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class MultiPartAttribute : PartAttribute
     {
-        public MultiPartAttribute(object partObjKey = null) : base(partObjKey)
+        public MultiPartAttribute(Type partType, object partObjKey = null) : base(partType, partObjKey)
         {
             IsMulti = true;
         }

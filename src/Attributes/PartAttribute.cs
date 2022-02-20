@@ -16,11 +16,13 @@ namespace NP.Utilities.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class PartAttribute : Attribute
     {
+        public Type PartType { get; }
+
         public object PartKey { get; }
 
         public bool IsMulti { get; protected set; }
 
-        public PartAttribute(object partObjKey = null)
+        public PartAttribute(Type partType = null, object partObjKey = null)
         {
             PartKey = partObjKey;
 
