@@ -13,7 +13,7 @@ using System;
 
 namespace NP.Utilities.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class MultiImplementsAttribute : ImplementsAttribute
     {
         public MultiImplementsAttribute(Type typeToResolve = null, object partKey = null) 
