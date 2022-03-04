@@ -9,4 +9,8 @@
     <Description>Contains the basic utility functionality</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Expressions\" />
+  </ItemGroup>
 </Project>
