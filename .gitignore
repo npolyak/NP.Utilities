@@ -5,3 +5,8 @@
 /src/.vs/NP.Utilities
 /src/bin/Debug/net5.0
 /src/obj
+/src/NP.Utilities.1.0.8.nupkg
+/Tests/SerializationTest/.vs/SerializationTest
+/Tests/SerializationTest/bin/Debug/net6.0
+/Tests/SerializationTest/obj/Debug/net6.0
+/Tests/SerializationTest/obj
