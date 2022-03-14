@@ -88,8 +88,6 @@ namespace NP.Utilities
             return typeStr;
         }
 
-
-
         public static string GetTypeNameWithUnboxing(this Type type)
         {
             if (type == typeof(object))

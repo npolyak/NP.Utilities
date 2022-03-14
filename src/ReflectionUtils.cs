@@ -571,7 +571,9 @@ namespace NP.Utilities
 
         public static Type FindTypeByFullName(this string str)
         {
-            return _fullNameTypesCache.Get(str);
+            //return _fullNameTypesCache.Get(str);
+
+            return FindTypeByFullNameImpl(str);
         }
 
         public static Type GetTypeByAssemblyQualifiedName(this string assemblyQualifiedTypeName)

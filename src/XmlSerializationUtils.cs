@@ -57,7 +57,7 @@ namespace NP.Utilities
             writer.Flush();
         }
 
-        public static T Deserialize<T>(string xmlStr, params Type[] extraTypes)
+        public static T Deserialize<T>(string xmlStr, bool isAsync = false, params Type[] extraTypes)
         {
             if (xmlStr.IsNullOrEmpty())
             {
@@ -68,7 +68,16 @@ namespace NP.Utilities
 
             using (StringReader stringReader = new StringReader(xmlStr))
             {
-                T result = (T)xmlSerializer.Deserialize(stringReader);
+                XmlReaderSettings settings = null;
+
+                if (isAsync)
+                {
+                    settings = new XmlReaderSettings() { Async = true };
+                }
+
+                XmlReader xmlReader = XmlReader.Create(stringReader, settings);
+
+                T result = (T)xmlSerializer.Deserialize(xmlReader);
 
                 IPastRestorable restorable =
                     result as IPastRestorable;
@@ -81,13 +90,13 @@ namespace NP.Utilities
             }
         }
 
-        public static T DeserializeFromFile<T>(string filePath, params Type[] extraTypes)
+        public static T DeserializeFromFile<T>(string filePath, bool isAsync = false, params Type[] extraTypes)
         {
             using StreamReader reader = new StreamReader(filePath);
 
             string serializationStr = reader.ReadToEnd();
 
-            return Deserialize<T>(serializationStr, extraTypes);
+            return Deserialize<T>(serializationStr, isAsync, extraTypes);
         }
 
         static string ReplaceEncoding(this string str)
