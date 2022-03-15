@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="*.nupkg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Expressions\" />
   </ItemGroup>
 </Project>
