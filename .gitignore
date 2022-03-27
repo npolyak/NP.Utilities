@@ -10,3 +10,5 @@
 /Tests/SerializationTest/bin/Debug/net6.0
 /Tests/SerializationTest/obj/Debug/net6.0
 /Tests/SerializationTest/obj
+/Tests/ExpressionTest/.vs/ExpressionTest
+/Tests/ExpressionTest/obj
