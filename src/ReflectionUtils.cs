@@ -28,13 +28,11 @@ namespace NP.Utilities
         (
             this Type type,
             string propName,
-            bool includeNonPublic
+            bool includeNonPublic,
+            bool includeStatic = false
         )
         {
-            BindingFlags bindingFlags = BindingFlags.Public;
-
-            if (includeNonPublic)
-                bindingFlags |= BindingFlags.NonPublic;
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, includeStatic);
 
             MemberInfo[] result =
                 type.GetMember(propName, bindingFlags);
@@ -46,10 +44,11 @@ namespace NP.Utilities
         (
             this Type type,
             string memberName,
-            bool includeNonPublic
+            bool includeNonPublic,
+            bool includeStatic = false
         )
         {
-            MemberInfo[] memberInfos = type.GetMemberInfos(memberName, includeNonPublic);
+            MemberInfo[] memberInfos = type.GetMemberInfos(memberName, includeNonPublic, includeStatic);
 
             if (memberInfos.Length == 1)
             {
@@ -68,27 +67,32 @@ namespace NP.Utilities
             return null;
         }
 
-        public static MemberInfo GetSingleMemberInfo(this Type type, string memberName)
+        public static MemberInfo 
+            GetSingleMemberInfo
+            (
+            this Type type, 
+            string memberName,
+            bool includeNonPublic = false,
+            bool includeStatic = false)
         {
-            MemberInfo result = type.GetSingleMemberInfoImpl(memberName, false);
+            MemberInfo result = 
+                type.GetSingleMemberInfoImpl
+                (
+                    memberName, 
+                    includeNonPublic, 
+                    includeStatic);
 
             if (result == null)
             {
-                // if there are no public members found - try a non-public one
-                result = type.GetSingleMemberInfoImpl(memberName, true);
+                throw new Exception
+                    ($"Error: No member of name {memberName} is found within {type.GetFullTypeStr()} class.");
 
-                if (result == null)
-                {
-                    throw new Exception
-                        ($"Error: No member of name {memberName} is found within {type.GetFullTypeStr()} class.");
-
-                }
             }
 
             return result;
         }
 
-        static BindingFlags GetBindingFlags(bool includeNonPublic, bool isStatic)
+        private static BindingFlags GetBindingFlags(bool includeNonPublic, bool isStatic)
         {
             BindingFlags bindingFlags =
                 BindingFlags.Public;
@@ -112,9 +116,10 @@ namespace NP.Utilities
         (
             this Type type,
             string fieldName,
-            bool includeNonPublic = true)
+            bool includeNonPublic = true,
+            bool includeStatic = false)
         {
-            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, includeStatic);
 
             FieldInfo fieldInfo = type.GetField(fieldName, bindingFlags);
 
@@ -125,9 +130,10 @@ namespace NP.Utilities
         (
             this Type type,
             string propName,
-            bool includeNonPublic = false)
+            bool includeNonPublic = false, 
+            bool includeStatic = false)
         {
-            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, includeStatic);
 
             PropertyInfo sourcePropInfo = type.GetProperty(propName, bindingFlags);
 
@@ -138,10 +144,11 @@ namespace NP.Utilities
         (
             this Type type,
             string methodName,
-            bool includeNonPublic = false
+            bool includeNonPublic = false,
+            bool includeStatic = false
         )
         {
-            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, false);
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, includeStatic);
 
             MethodInfo methodInfo = type.GetMethod(methodName, bindingFlags);
 
@@ -153,9 +160,10 @@ namespace NP.Utilities
         (
             this Type type,
             string propName,
-            bool includeNonPublic = false)
+            bool includeNonPublic = false,
+            bool includeStatic = false)
         {
-            return type.GetPropInfoFromType(propName, includeNonPublic).PropertyType;
+            return type.GetPropInfoFromType(propName, includeNonPublic, includeStatic).PropertyType;
         }
 
         public static Type GetMethodArgType
@@ -163,11 +171,12 @@ namespace NP.Utilities
             this Type type,
             string methodName,
             int argIdx = 0,
-            bool includeNonPublic = false
+            bool includeNonPublic = false,
+            bool includeStatic = false
         )
         {
             MethodInfo methodInfo =
-                type.GetMethodInfoFromType(methodName, includeNonPublic);
+                type.GetMethodInfoFromType(methodName, includeNonPublic, includeStatic);
 
             ParameterInfo[] parameters =
                 methodInfo.GetParameters();
@@ -288,7 +297,7 @@ namespace NP.Utilities
             return methodParamTypes.Zip(argRealTypes).All(item => item.First.IsAssignableFrom(item.Second));
         }
 
-        public static object CallMethod(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
+        public static object CallMethodExtras(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
         {
             MethodInfo methodInfo = obj.GetMethod(methodName, includeNonPublic, isStatic, args.Select(arg => arg.GetType()).ToArray());
 
@@ -297,7 +306,7 @@ namespace NP.Utilities
 
         public static object CallMethod(this object obj, string methodName, params object[] args)
         {
-            return CallMethod(obj, methodName, false, false, args);
+            return CallMethodExtras(obj, methodName, false, false, args);
         }
 
         public static T GetCompoundPropValue<T>
@@ -336,16 +345,26 @@ namespace NP.Utilities
             nextObj?.SetCompoundPropValue(remainder, val);
         }
 
-        public static PropertyInfo GetStaticPropInfo(this Type type, string propName)
+        public static PropertyInfo GetStaticPropInfo
+        (
+            this Type type, 
+            string propName,
+            bool includeNonPublic = false)
         {
-            PropertyInfo propInfo = type.GetProperty(propName, BindingFlags.Static | BindingFlags.Public);
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, true);
+
+            PropertyInfo propInfo = type.GetProperty(propName, bindingFlags);
 
             return propInfo;
         }
 
-        public static object GetStaticPropValue(this Type type, string propName)
+        public static object GetStaticPropValue
+        (
+            this Type type, 
+            string propName,
+            bool includeNonPublic = false)
         {
-            PropertyInfo propInfo = type.GetStaticPropInfo(propName);
+            PropertyInfo propInfo = type.GetStaticPropInfo(propName, includeNonPublic);
 
             object val = propInfo.GetValue(type);
 
@@ -353,16 +372,26 @@ namespace NP.Utilities
         }
 
 
-        public static FieldInfo GetStaticFieldInfo(this Type type, string propName)
+        public static FieldInfo GetStaticFieldInfo
+        (
+            this Type type, 
+            string propName,
+            bool includeNonPublic = false)
         {
-            FieldInfo fieldInfo = type.GetField(propName, BindingFlags.Static | BindingFlags.Public);
+            BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, true);
+
+            FieldInfo fieldInfo = type.GetField(propName, bindingFlags);
 
             return fieldInfo;
         }
 
-        public static object GetStaticFieldValue(this Type type, string fieldName)
+        public static object GetStaticFieldValue
+        (
+            this Type type, 
+            string fieldName,
+            bool includeNonPublic = false)
         {
-            FieldInfo fieldInfo = type.GetStaticFieldInfo(fieldName);
+            FieldInfo fieldInfo = type.GetStaticFieldInfo(fieldName, includeNonPublic);
 
             object val = fieldInfo.GetValue(type);
 
