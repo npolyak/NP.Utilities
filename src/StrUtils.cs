@@ -222,6 +222,14 @@ namespace NP.Utilities
             return result;
         }
 
+        /// <summary>
+        /// single quotes
+        /// </summary>
+        public static string Sq(this object obj)
+        {
+            return $"'{obj.ToStr()}'";
+        }
+
         public static bool IsStrNullOrWhiteSpace(this string str)
         {
             return string.IsNullOrWhiteSpace(str);
@@ -266,10 +274,6 @@ namespace NP.Utilities
         {
             return coll?.Cast<object>().StrConcat(null, separator);
         }
-
-        public static void Throw(this string str) => throw new Exception(str);
-
-        public static void ThrowProgError(this string str) => throw new ProgrammingError(str);
 
         public static TEnum Parse<TEnum>(this string str)
             where TEnum : struct

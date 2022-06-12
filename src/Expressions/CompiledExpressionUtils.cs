@@ -97,7 +97,11 @@ namespace NP.Utilities.Expressions
                 ParameterExpression objParamExpression,
                 ParameterExpression valueParamExpression,
                 MemberExpression propertyExpression,
-                UnaryExpression valueCastExpression) GetExpressions(this Type objType, string propertyName, Type propItemType)
+                UnaryExpression valueCastExpression) GetExpressions
+            (
+                this Type objType, 
+                string propertyName, 
+                Type propItemType)
         {
 
             ParameterExpression objParamExpression = Expression.Parameter(typeof(object));
