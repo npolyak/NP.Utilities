@@ -2,15 +2,24 @@
 
 namespace NP.Utilities.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = false, Inherited = true)]
     public class DataPointAttribute : Attribute
     {
-        public object Key { get; set; }
         public DataPointDirection Direction { get; }
 
-        public DataPointAttribute(DataPointDirection direction)
+        public string? TriggersActionName { get; }
+
+        public string? ChangedByActionName { get; }
+
+        public DataPointAttribute
+        (
+            DataPointDirection direction, 
+            string triggersActionName = null,
+            string changedByActionName = null)
         {
             this.Direction = direction;
+            TriggersActionName = triggersActionName;
+            ChangedByActionName = changedByActionName;
         }
     }
 }
