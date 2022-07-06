@@ -20,8 +20,6 @@ namespace NP.Utilities.Attributes
 
         public object PartKey { get; set; }
 
-        public bool IsMulti { get; protected set; } = false;
-
         public PartAttribute(Type typeToResolve = null, object partKey = null)
         {
             this.TypeToResolve = typeToResolve;

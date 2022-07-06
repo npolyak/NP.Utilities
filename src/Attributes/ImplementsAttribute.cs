@@ -14,27 +14,18 @@ using System;
 namespace NP.Utilities.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class ImplementsAttribute : Attribute
+    public class ImplementsAttribute : MappingBaseAttribute
     {
-        public bool IsSingleton { get; set; } = false;
-
-        public Type TypeToResolve { get; set; }
-
-        public object PartKey { get; } = null;
-
-        public bool IsMulti { get; protected set; }
-
         public ImplementsAttribute(bool isSingleton = false, object partKey = null)
+            : base(isSingleton, partKey)
         {
-            IsSingleton = isSingleton;
-            PartKey = partKey;
-            IsMulti = false;
+
         }
 
         public ImplementsAttribute(Type typeToResolve, bool isSingleton = false, object partKey = null) : 
-            this(isSingleton, partKey)
+            base(typeToResolve, isSingleton, partKey)
         {
-            TypeToResolve = typeToResolve;
+
         }
     }
 }
