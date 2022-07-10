@@ -574,6 +574,19 @@ namespace NP.Utilities
             return result;
         }
 
+        public static IEnumerable<Type> GetBaseTypeAndInterfaces(this Type type)
+        {
+            if (type.BaseType != typeof(object))
+            {
+                yield return type.BaseType;
+            }
+
+            foreach(var interfaceType in type.GetInterfaces())
+            {
+                yield return interfaceType;
+            }
+        }
+
         public static string GetCurrentExecutablePath()
         {
             string currentExecutablePath =
