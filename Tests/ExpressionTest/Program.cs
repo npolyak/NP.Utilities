@@ -140,7 +140,15 @@ public class Program
                 new ParameterExpression[] { variableExpr },
                 new Expression[] { assignExpr, callPlusRefExpr, variableExpr });
 
-        Func<int, int, int> f = Expression.Lambda<Func<int, int, int>>(body, new ParameterExpression[] { inputParamExpression1, inputParamExpression2 }).Compile();
+        Func<int, int, int> f =
+            Expression.Lambda<Func<int, int, int>>
+            (
+                body, 
+                new ParameterExpression[]
+                {
+                    inputParamExpression1, 
+                    inputParamExpression2 })
+            .Compile();
 
         int i1 = 3, i2 = 4;
         int i = f(i1, i2); // i = 7

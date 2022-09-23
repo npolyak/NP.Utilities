@@ -2,7 +2,7 @@
 
 namespace NP.Utilities.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public class DataPointAttribute : Attribute
     {
         public DataPointDirection Direction { get; }
