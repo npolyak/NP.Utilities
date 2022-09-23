@@ -99,8 +99,8 @@ namespace NP.Utilities.Expressions
                 MemberExpression propertyExpression,
                 UnaryExpression valueCastExpression) GetExpressions
             (
-                this Type objType, 
-                string propertyName, 
+                this Type objType,
+                string propertyName,
                 Type propItemType)
         {
 
@@ -155,9 +155,9 @@ namespace NP.Utilities.Expressions
 
         private static Action<object, object> CreateCollectionProcessor
         (
-            this Type objType, 
+            this Type objType,
             string collectionPropName,
-            Type collectionProcessingClass, 
+            Type collectionProcessingClass,
             string collectionProcessingMethod,
             DoubleParamMap<Type, string, Action<object, object>> cache)
         {
@@ -199,9 +199,9 @@ namespace NP.Utilities.Expressions
             return objType
                     .CreateCollectionProcessor
                     (
-                        collectionPropName, 
-                        typeof(CollectionUtils), 
-                        nameof(CollectionUtils.AddIfNotThereSimple), 
+                        collectionPropName,
+                        typeof(CollectionUtils),
+                        nameof(CollectionUtils.AddIfNotThereSimple),
                         _untypedCollectionAddersCacher);
         }
 
@@ -238,7 +238,7 @@ namespace NP.Utilities.Expressions
 
         public static Action<object, object> GetUntypedVoidSingleArgMethodByObjType
         (
-            this Type objType, 
+            this Type objType,
             string methodName
         )
         {
@@ -278,7 +278,7 @@ namespace NP.Utilities.Expressions
 
         public static Action<object> GetUntypedVoidNoArgsMethodByObjType
         (
-            this Type objType, 
+            this Type objType,
             string methodName
         )
         {
@@ -310,7 +310,7 @@ namespace NP.Utilities.Expressions
         // in this function we figure out the property type from the object itself
         public static Action<TObject, object> GetTypedCSPropertySetter<TObject>
         (
-            this TObject obj, 
+            this TObject obj,
             string propertyName
         )
         {
@@ -325,22 +325,22 @@ namespace NP.Utilities.Expressions
 
             Type propertyType = objType.GetPropType(propertyName);
 
-            ParameterExpression objParamExpression = 
+            ParameterExpression objParamExpression =
                 Expression.Parameter(objType);
 
-            ParameterExpression propertyParamExpression = 
+            ParameterExpression propertyParamExpression =
                 Expression.Parameter(typeof(object), propertyName);
 
-            UnaryExpression propertyCastExpression = 
+            UnaryExpression propertyCastExpression =
                 Expression.Convert(propertyParamExpression, propertyType);
 
-            MemberExpression propertyExpression = 
+            MemberExpression propertyExpression =
                 Expression.Property(objParamExpression, propertyName);
 
-            BinaryExpression assignExpression = 
+            BinaryExpression assignExpression =
                 Expression.Assign(propertyExpression, propertyCastExpression);
 
-            Action<TObject, object> result = 
+            Action<TObject, object> result =
                 Expression.Lambda<Action<TObject, object>>
             (
                 assignExpression, objParamExpression, propertyParamExpression
@@ -356,13 +356,13 @@ namespace NP.Utilities.Expressions
             new DoubleParamMap<Type, string, object>();
 
         // returns property setter:
-        public static Action<TObject, TProperty> 
+        public static Action<TObject, TProperty>
             GetFullyTypedCSPropertySetter<TObject, TProperty>(string propertyName)
         {
             Type objType = typeof(TObject);
 
             object resultObj;
-            if(_fullyTypedSettersCache.TryGetValue(objType, propertyName, out resultObj))
+            if (_fullyTypedSettersCache.TryGetValue(objType, propertyName, out resultObj))
             {
                 return resultObj as Action<TObject, TProperty>;
             }
@@ -414,7 +414,7 @@ namespace NP.Utilities.Expressions
         public static Expression CreateAssignArrayCellExpression
         (
             this ParameterExpression arrayParameterExpression, // e.g. created by Expression.Parameter(typeof(object[]), "inputParams"); 
-            int cellIdx, 
+            int cellIdx,
             Expression exprToAssign)
         {
             var assignArrayCell =
@@ -442,7 +442,7 @@ namespace NP.Utilities.Expressions
         // }
         public static MethodCallExpression GetMethodCallFromParamArray
         (
-            this MethodInfo methodInfo, 
+            this MethodInfo methodInfo,
             ParameterExpression inputParams,
             object obj = null)
         {
@@ -450,10 +450,10 @@ namespace NP.Utilities.Expressions
                 methodInfo.GetParameters()
                             .Select
                             (
-                                (param, idx) => 
+                                (param, idx) =>
                                         Expression.Convert
                                         (
-                                            inputParams.CreateArrayCellAccessExpression(idx), 
+                                            inputParams.CreateArrayCellAccessExpression(idx),
                                             param.ParameterType)).ToArray();
             Expression instanceExpression = null;
 
@@ -505,7 +505,7 @@ namespace NP.Utilities.Expressions
             object obj = null)
         {
             var array = Expression.Parameter(typeof(object[]), "inputParams");
-            
+
             MethodCallExpression methodCallExpr = methodInfo.GetMethodCallFromParamArray(array, obj);
 
             var finalExpr = Expression.Convert(methodCallExpr, typeof(object));
@@ -517,6 +517,17 @@ namespace NP.Utilities.Expressions
             return result;
         }
 
+        //public static Func<object[], object[]> GetParamArrayLambda
+        //(
+        //    this MethodInfo methodInfo,
+        //    object obj = null
+        //)
+        //{
+        //    var array = Expression.Parameter(typeof(object[]), "inputParams");
+        //    MethodCallExpression methodCallExpr = methodInfo.GetMethodCallFromParamArray(array, obj);
+
+
+        //}
 
         /// <summary>
         /// this method is exact opposite of GetMethodCallFromParamArray. It creates a MethodCallExpression

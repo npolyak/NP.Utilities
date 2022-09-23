@@ -15,6 +15,11 @@ public class Program
         number1 += number2;
     }
 
+    public static void PlusOut(int n1, int n2, out int result)
+    {
+        result = n1 + n2;
+    }
+
     internal static int Square(int i)
     {
         return i * i;
@@ -104,7 +109,6 @@ public class Program
         var result = Expression.Lambda<Func<int>>(blockExp).Compile()();
     }
 
-
     public static void RefSampleWithInputArgs()
     {
 
@@ -144,17 +148,119 @@ public class Program
         Console.WriteLine(i);
     }
 
+    public static void RefSampleWithInputArgsConvertion()
+    {
+
+        Type type = typeof(Program);
+
+        MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
+
+        ParameterExpression inputParamExpression1 = Expression.Parameter(typeof(int), "i1");
+        ParameterExpression variableExpr = Expression.Variable(typeof(int), "referencedInt");
+        Expression assignExpr = Expression.Assign(variableExpr, inputParamExpression1);
+
+        ParameterExpression inputParamExpression2 = Expression.Parameter(typeof(int), "i2");
+
+        var callPlusRefExpr = Expression.Call(plusRefMethodInfo, variableExpr, inputParamExpression2);
+
+        ///.Block(System.Int32 $referencedInt) { // this is where the block's variables are defined (ref or not does not matter)
+        ///        $referencedInt = $i1; // i1 is the variable coming from the input parameters
+        ///        .Call Program.PlusRef(
+        ///            $referencedInt,
+        ///            $i2);             // i2 is the variagble coming from input parameters
+        ///        $referencedInt   // last line specifies what the block returns.
+        /// }       
+        /// 
+
+        Expression body =
+            Expression.Block
+            (
+                typeof(int),
+                new ParameterExpression[] { variableExpr },
+                new Expression[] { assignExpr, callPlusRefExpr, variableExpr });
+
+        Func<object[], object[]> f =
+            Expression.Lambda<Func<object[], object[]>>(body, new ParameterExpression[] { inputParamExpression1, inputParamExpression2 }).Compile();
+
+        int i1 = 3, i2 = 4;
+        object[] result = f(new object[] { 3, 4}); // i = 7
+
+        Console.WriteLine(result[0]);
+    }
+
+    public static void OutSampleWithInputArgs()
+    {
+
+        Type type = typeof(Program);
+
+        MethodInfo plusOutMethodInfo = type.GetMethod(nameof(Program.PlusOut))!;
+
+        ParameterExpression inputParamExpression1 = Expression.Parameter(typeof(int), "i1");
+        ParameterExpression variableExpr = Expression.Variable(typeof(int), "outInt");
+
+        ParameterExpression inputParamExpression2 = Expression.Parameter(typeof(int), "i2");
+
+        var callPlusOutExpr = 
+            Expression.Call
+            (
+                plusOutMethodInfo, 
+                inputParamExpression1, 
+                inputParamExpression2,
+                variableExpr);
+
+        //.Block(System.Int32 $outInt) { // defined outInt
+        //    .Call Program.PlusOut(
+        //        $i1, // from method params
+        //        $i2, // from method params
+        //        $outInt); // passing outInt
+        //    $outInt // returning outInt
+        //}
+
+        Expression body =
+            Expression.Block
+            (
+                typeof(int),
+                new ParameterExpression[] { variableExpr },
+                new Expression[] { callPlusOutExpr, variableExpr });
+
+        Func<int, int, int> f =
+            Expression.Lambda<Func<int, int, int>>
+            (
+                body, 
+                new ParameterExpression[] { inputParamExpression1, inputParamExpression2 }).Compile();
+
+        int i1 = 3, i2 = 4;
+        int i = f(i1, i2); // i = 7
+
+        Console.WriteLine(i);
+    }
+
     public static void Main(string[] args)
     {
-        //VoidMethodTest();
+        // VoidMethodTest();
 
-        //MultiArgMethodWithReturnTest();
+        // MultiArgMethodWithReturnTest();
 
         // TestBlockExprWithReturn();
 
-        //RefSampleFromStackOverflow();
+        // RefSampleFromStackOverflow();
 
-        RefSampleWithInputArgs();
+        // RefSampleWithInputArgs();
+
+        // OutSampleWithInputArgs();
+
+        RefSampleWithInputArgsConvertion();
+
+        object[] Plus(object[] args)
+        {
+            int refInt = (int) args[0];
+
+            PlusRef(ref refInt, (int)args[1]);
+
+            return new object [] { refInt };
+        }
+
+
     }
 }
 
