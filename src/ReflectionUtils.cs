@@ -21,9 +21,44 @@ namespace NP.Utilities
     using System.IO;
     using System.Threading.Tasks;
     using static NP.Utilities.StrUtils;
+   
+    public enum ParamKind
+    {
+        Plain,
+        Ref,
+        Out,
+        Return
+    }
 
     public static class ReflectionUtils
     {
+        public static ParamKind GetParamKind(this ParameterInfo? paramInfo)
+        {
+            if (paramInfo.IsRetval)
+            {
+                return ParamKind.Return;
+            }
+
+            if (paramInfo.ParameterType.IsByRef)
+            {
+                if (paramInfo.IsOut)
+                {
+                    return ParamKind.Out;
+                }
+                else
+                {
+                    return ParamKind.Ref;
+                }
+            }
+
+            return ParamKind.Plain;
+        }
+
+        public static string GetParamInfoStr(this ParameterInfo paramInfo)
+        {
+            return $"{paramInfo.Name}-{paramInfo.ParameterType.Name} 'Position:{paramInfo.Position}', 'Kind:{paramInfo.GetParamKind()}'";
+        }
+
         public static MemberInfo[] GetMemberInfos
         (
             this Type type,
