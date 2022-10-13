@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<PackageId>NP.Utilities</PackageId>
 		<Company>AWebPros</Company>
 		<Description>Contains the basic utility functionality</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Remove="*.nupkg" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Expressions\" />
 	</ItemGroup>
 </Project>

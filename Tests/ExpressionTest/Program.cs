@@ -123,7 +123,7 @@ public class Program
 
         ParameterExpression inputParamExpression1 = Expression.Parameter(typeof(int), "i1");
         ///$i1
-       
+
         ParameterExpression variableExpr = Expression.Variable(typeof(int), "referencedInt");
         ///$referencedInt
 
@@ -252,8 +252,6 @@ public class Program
 
         MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
 
-
-
         ParameterExpression inputParamExpression1 = Expression.Parameter(typeof(int), "i1");
         ParameterExpression variableExpr = Expression.Variable(typeof(int), "referencedInt");
         Expression assignExpr = Expression.Assign(variableExpr, inputParamExpression1);
@@ -268,7 +266,7 @@ public class Program
         Expression body =
             Expression.Block
             (
-                typeof(int),
+                typeof(int), // return type
                 new ParameterExpression[] { variableExpr },
                 new Expression[] { assignExpr, callPlusRefExpr, variableExpr });
         ///.Block(System.Int32 $referencedInt) { // this is where the block's variables are defined (ref or not does not matter)
@@ -281,14 +279,109 @@ public class Program
         /// 
 
         Expression<Func<object[], object[]>> lambdaExpression =
-            Expression.Lambda<Func<object[], object[]>>(body, new ParameterExpression[] { inputParamExpression1, inputParamExpression2 }); 
+            Expression.Lambda<Func<object[], object[]>>(body, new ParameterExpression[] { inputParamExpression1, inputParamExpression2 });
 
         Func<object[], object[]> f = lambdaExpression.Compile();
 
         int i1 = 3, i2 = 4;
-        object[] result = f(new object[] { 3, 4}); // i = 7
+        object[] result = f(new object[] { 3, 4 }); // i = 7
 
         Console.WriteLine(result[0]);
+    }
+
+
+    public static void UsingParamValues()
+    {
+        Type type = typeof(Program);
+
+        ParameterExpression inputArrayParamsExpression = Expression.Parameter(typeof(object[]), MethodCaller.INPUT_PARAM_NAME);
+        ParameterExpression outputArrayParamsExpression = Expression.Parameter(typeof(object[]), MethodCaller.OUTPUT_PARAM_NAME);
+
+        MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
+
+        ParamValue[] paramValues =
+            plusRefMethodInfo
+                .GetParameters()
+                .Select(p => new ParamValue(p, inputArrayParamsExpression, outputArrayParamsExpression)).ToArray();
+
+        int inputIdx = 0;
+        int outputIdx = 0;
+
+        foreach (var paramValue in paramValues)
+        {
+            if (paramValue.IsIn)
+            {
+                paramValue.InputIdx = inputIdx;
+                inputIdx++;
+            }
+
+            if (paramValue.IsOut)
+            {
+                paramValue.OutputIdx = outputIdx;
+                outputIdx++;
+            }
+        }
+
+        IEnumerable<ParamValue> outputParams = paramValues.Where(p => p.IsOut);
+
+        var callExpression = Expression.Call(plusRefMethodInfo, paramValues.Where(p => p.InputParamExpression != null).Select(p => p.InputParamExpression));
+
+        ///.Call Program.PlusRef(
+        ///    $referenceInt,
+        ///    $number2)
+
+        IEnumerable<Expression> assignInputExpressions =
+            paramValues
+                .Where(p => p.AssignInputValueExpression != null)
+                .Select(p => p.AssignInputValueExpression);
+
+        IEnumerable<Expression> assignOutputExpressions =
+            paramValues
+                .Where(p => p.IsOut)
+                .Select(p => p.AssignOutputValueExpression);
+
+        Expression body =
+            Expression.Block
+            (
+                //typeof(object[]),
+                outputParams.Select(p => p.Expr).ToArray(), // variables
+                assignInputExpressions.Union(new[] { callExpression }).Union(assignOutputExpressions).ToArray());
+
+        ///.Block(System.Int32 $referenceInt) {
+        ///    $referenceInt = (System.Int32)$__Input__[0];
+        ///    .Call Program.PlusRef(
+        ///        $referenceInt,
+        ///        (System.Int32)$__Input__[1]);
+        ///    $__Output__[0] = (System.Object)$referenceInt
+        ///}
+
+        Expression<Action<object[], object[]>> lambdaExpression =
+            Expression.Lambda<Action<object[], object[]>>
+            (
+                body,
+                new ParameterExpression[] { inputArrayParamsExpression, outputArrayParamsExpression }
+            );
+        ///.Lambda #Lambda1<System.Action`2[System.Object[],System.Object[]]>(
+        ///    System.Object[] $__Input__,
+        ///    System.Object[] $__Output__) {
+        ///    .Block(System.Int32 $referenceInt) {
+        ///        $referenceInt = (System.Int32)$__Input__[0];
+        ///        .Call Program.PlusRef(
+        ///            $referenceInt,
+        ///            (System.Int32)$__Input__[1]);
+        ///        $__Output__[0] = (System.Object)$referenceInt
+        ///    }
+        ///}
+
+        Action<object[], object[]> lambda = lambdaExpression.Compile();
+
+        var input = new object[] { 13, 2 };
+
+        var output = new object[1];
+
+        lambda(input, output);
+
+        Console.WriteLine($"Result = {output[0]}");
     }
 
     public static void Main(string[] args)
@@ -307,29 +400,32 @@ public class Program
 
         //RefSampleWithInputArgsConversion();
 
+        //UsingParamValues();
 
-        MethodInfo plusRefMethodInfo = typeof(Program).GetMethod(nameof(PlusOut))!;
+        Type type = typeof(Program);
 
-        var parameters = plusRefMethodInfo.GetParameters();
+        MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
+        MethodCaller methodCaller = new MethodCaller(plusRefMethodInfo);
 
-        var param1 = parameters[0];
-        Console.WriteLine(param1.GetParamInfoStr());
+        methodCaller.SetInputValue("referenceInt", 123);
+        methodCaller.SetInputValue("number2", 34);
 
-        var param2 = parameters[1];
-        Console.WriteLine(param2.GetParamInfoStr());
+        methodCaller.Call();
 
+        int refInt = (int) methodCaller.GetOutputValue("referenceInt")!;
+        Console.WriteLine(refInt);
 
-        var param3 = parameters[2];
-        Console.WriteLine(param3.GetParamInfoStr());
+        MethodInfo plusOutMethodInfo = 
+            type.GetMethod(nameof(Program.PlusOut))!;
+        MethodCaller outMethodCaller = new MethodCaller(plusOutMethodInfo);
+        outMethodCaller.SetInputValue("i1", 12);
+        outMethodCaller.SetInputValue("i2", 4);
 
-        //object[] Plus(object[] args)
-        //{
-        //    int refInt = (int) args[0];
+        outMethodCaller.Call();
 
-        //    PlusRef(ref refInt, (int)args[1]);
+        int outInt = (int) outMethodCaller.GetOutputValue("result")!;
 
-        //    return new object [] { refInt };
-        //}
+        Console.WriteLine(outInt);
     }
 }
 

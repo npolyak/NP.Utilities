@@ -32,7 +32,7 @@ namespace NP.Utilities
 
     public static class ReflectionUtils
     {
-        public static ParamKind GetParamKind(this ParameterInfo? paramInfo)
+        public static ParamKind GetParamKind(this ParameterInfo paramInfo)
         {
             if (paramInfo.IsRetval)
             {
@@ -53,6 +53,27 @@ namespace NP.Utilities
 
             return ParamKind.Plain;
         }
+
+        public static bool IsIn(this ParamKind paramKind)
+        {
+            return (paramKind == ParamKind.Plain) || (paramKind == ParamKind.Ref);
+        }
+
+        public static bool IsOut(this ParamKind paramKind)
+        {
+            return paramKind != ParamKind.Plain;
+        }
+
+        public static bool IsIn(this ParameterInfo paramInfo)
+        {
+            return paramInfo.GetParamKind().IsIn();
+        }
+
+        public static bool IsOut(this ParameterInfo paramInfo)
+        {
+            return paramInfo.GetParamKind().IsOut();
+        }
+
 
         public static string GetParamInfoStr(this ParameterInfo paramInfo)
         {
