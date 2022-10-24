@@ -598,7 +598,7 @@ namespace NP.Utilities
             this IEnumerable<T> collection, 
             params T[] additionalParams)
         {
-            return collection.Union(additionalParams);
+            return collection.Union(additionalParams.NullToEmpty().Where(additionalParam => additionalParam != null));
         }
 
         public static void InsertUpdateOrRemove<T>

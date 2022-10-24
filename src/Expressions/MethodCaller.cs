@@ -10,6 +10,7 @@ namespace NP.Utilities.Expressions
 
         public const string INPUT_PARAM_NAME = "__Input__";
         public const string OUTPUT_PARAM_NAME = "__Output__";
+        public const string RETURN_PARAM_NAME = "__RETURN__";
 
         public Expression<Action<object?[], object?[]>> Expr { get; }
 
@@ -19,9 +20,9 @@ namespace NP.Utilities.Expressions
 
         public ParamValue[] ParamValues { get; }
 
-        public IParamValGetter[] InputParams => ParamValues.Where(v => v.Param.IsIn()).ToArray();
+        public IParamValGetter[] InputParams { get; }
 
-        public IParamValSetter[] OutputParams => ParamValues.Where(v => v.Param.IsOut()).ToArray();
+        public IParamValSetter[] OutputParams { get; }
 
         public int NumberInputs => InputParams.Count();
 
@@ -65,6 +66,10 @@ namespace NP.Utilities.Expressions
             }
 
             ParamValues = paramValues.ToArray();
+
+            InputParams = ParamValues.Where(v => v.Param.IsIn()).ToArray();
+
+            OutputParams = ParamValues.Where(v => v.Param.IsOut()).ToArray();
 
             int inputIdx = 0;
             int outputIdx = 0;
@@ -114,12 +119,21 @@ namespace NP.Utilities.Expressions
                     .Where(p => p.IsOut)
                     .Select(p => p.AssignOutputValueExpression);
 
+
+            var blockVars = outputParams.Select(p => p.Expr).ToArray(); // variables
+
+            List<Expression> blockExpressions = assignInputExpressions.ToList();
+
+            blockExpressions.Add(callExpression);
+            blockExpressions.AddRange(assignOutputExpressions);
+
+
             Expression body =
                 Expression.Block
                 (
                     //typeof(object[]),
-                    outputParams.Select(p => p.Expr).ToArray(), // variables
-                    assignInputExpressions.Union(new[] { callExpression }).Union(assignOutputExpressions).ToArray());
+                    blockVars,
+                    blockExpressions);
 
             Expression<Action<object[], object?[]>> lambdaExpression =
                 Expression.Lambda<Action<object[], object?[]>>

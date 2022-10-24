@@ -19,7 +19,7 @@ namespace NP.Utilities.Expressions
 
         public ParameterExpression _outputArrayParams;
 
-        public Expression? InputParamExpression => InputArrayAccessConvertExpr ?? Expr;
+        public Expression? InputParamExpression => IsIn ? (InputArrayAccessConvertExpr ?? Expr) : null;
 
 
         public object? Value { get; set; }
@@ -37,6 +37,8 @@ namespace NP.Utilities.Expressions
         // for reference type it will be corresponding non-reference type
         // e.g. for TheType=Int32& it will be Int32 (without ampersand at the end)
         public Type RealType { get; }
+
+        public Expression OutputArrayAccessExpr { get; private set; }
 
         public ParamValue(ParameterInfo param, ParameterExpression inputArrayParam, ParameterExpression outputArrayParams)
         {
@@ -56,19 +58,28 @@ namespace NP.Utilities.Expressions
                 RealType = TheType;
             }
 
-            if (IsOut)
+            if (IsReturn)
             {
-                Expr = Expression.Variable(RealType, Name);
+                Expr = Expression.Variable(RealType, MethodCaller.RETURN_PARAM_NAME);
             }
-            else // In only
+            else
             {
-                Expr = Expression.Parameter(RealType, Name);
+                if (IsOut)
+                {
+                    Expr = Expression.Variable(RealType, Name);
+                }
+                else // In only
+                {
+                    Expr = Expression.Parameter(RealType, Name);
+                }
             }
         }
 
-        public bool IsIn => Param.IsIn();
+        public bool IsReturn => Param.Position == -1;
 
-        public bool IsOut => Param.IsOut();
+        public bool IsIn => IsReturn ? false: Param.IsIn();
+
+        public bool IsOut => IsReturn ? true : Param.IsOut();
 
         private int _inputIdx;
         public int InputIdx
@@ -106,8 +117,16 @@ namespace NP.Utilities.Expressions
 
                 var outputArrayAccessExpr = _outputArrayParams.CreateArrayCellAccessExpression(_outputIdx);
 
-                ///e.g. $__Output__[0] = (System.Object)$referenceInt
-                AssignOutputValueExpression = Expression.Assign(outputArrayAccessExpr, Expression.Convert(Expr, typeof(object)));
+                if (IsReturn)
+                {
+                    OutputArrayAccessExpr = outputArrayAccessExpr;
+                }
+
+                else
+                {
+                    ///e.g. $__Output__[0] = (System.Object)$referenceInt
+                    AssignOutputValueExpression = Expression.Assign(outputArrayAccessExpr, Expression.Convert(Expr, typeof(object)));
+                }
             }
         }
 
