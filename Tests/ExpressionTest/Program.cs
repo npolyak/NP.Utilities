@@ -313,8 +313,8 @@ public class Program
         ParameterExpression outputArrayParamsExpression = 
             Expression.Parameter(typeof(object[]), MethodCaller.OUTPUT_PARAM_NAME);
 
-        ParameterExpression resultParamExpression =
-            Expression.Parameter(typeof(object), MethodCaller.RETURN_PARAM_NAME);
+        ParameterExpression returnParamExpression =
+            Expression.Parameter(typeof(object[]), MethodCaller.RETURN_PARAM_NAME);
 
         MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.Plus))!;
 
@@ -323,7 +323,7 @@ public class Program
                 .GetParameters()
                 .Select(p => new ParamValue(p, inputArrayParamsExpression, outputArrayParamsExpression));
 
-        ParamValue returnParamValue = new ParamValue(plusRefMethodInfo.ReturnParameter, inputArrayParamsExpression, outputArrayParamsExpression);
+        ParamValue returnParamValue = new ParamValue(plusRefMethodInfo.ReturnParameter, inputArrayParamsExpression, outputArrayParamsExpression, returnParamExpression);
 
 
         paramValues = paramValues.UnionSingle(returnParamValue).ToArray();
@@ -346,18 +346,19 @@ public class Program
         }
 
 
+        IEnumerable<ParamValue> inputParams = paramValues.Where(p => p.IsIn);
         IEnumerable<ParamValue> outputParams = paramValues.Where(p => p.IsOut);
 
         var callExpression = 
            Expression
                 .Assign
                 (
-                    returnParamValue.OutputArrayAccessExpr, 
+                    returnParamValue.ReturnArrayAccessExpr!, 
                     Expression.Convert(
                         Expression.Call
                         (
-                            plusRefMethodInfo, 
-                            paramValues.Where(p => p.InputParamExpression != null).Select(p => p.InputParamExpression)), 
+                            plusRefMethodInfo,
+                            inputParams.Select(p => p.InputParamExpression)!), 
                         typeof(object)
                     )
                 );
@@ -369,19 +370,24 @@ public class Program
         IEnumerable<Expression> assignInputExpressions =
             paramValues
                 .Where(p => p.AssignInputValueExpression != null)
-                .Select(p => p.AssignInputValueExpression);
+                .Select(p => p.AssignInputValueExpression)!;
 
         IEnumerable<Expression> assignOutputExpressions =
-            paramValues
-                .Where(p => p.IsOut && p.AssignOutputValueExpression != null)
-                .Select(p => p.AssignOutputValueExpression);
+            outputParams.Select(p => p.AssignOutputValueExpression)!;
+
+        IEnumerable<Expression> returnExpressions =
+            paramValues.Where(p => p.IsReturn)
+                        .Select(p => p.ReturnArrayAccessExpr)!;
 
         Expression body =
             Expression.Block
             (
                 typeof(object),
-                outputParams.Select(p => p.Expr)/*.Union(new[] {resultParamExpression})*/.ToArray(), // variables
-                assignInputExpressions.Union(new[] { callExpression }).Union(assignOutputExpressions).UnionSingle(returnParamValue.OutputArrayAccessExpr).ToArray()/*.Union(new[] {resultParamExpression})*/);
+                outputParams.Select(p => p.Expr).ToArray()!, // variables
+                assignInputExpressions
+                    .Union(new[] { callExpression })
+                    .Union(assignOutputExpressions)
+                    .Union(returnExpressions).ToArray()/*.Union(new[] {resultParamExpression})*/);
 
         ///.Block(System.Int32 $referenceInt) {
         ///    $referenceInt = (System.Int32)$__Input__[0];
@@ -391,11 +397,15 @@ public class Program
         ///    $__Output__[0] = (System.Object)$referenceInt
         ///}
 
-        Expression<Action<object[], object[]>> lambdaExpression =
-            Expression.Lambda<Action<object[], object[]>>
+        Expression<Action<object[], object[], object[]>> lambdaExpression =
+            Expression.Lambda<Action<object[], object[], object[]>>
             (
                 body,
-                new ParameterExpression[] { inputArrayParamsExpression, outputArrayParamsExpression}
+                new ParameterExpression[] 
+                { 
+                    inputArrayParamsExpression, 
+                    outputArrayParamsExpression,
+                    returnParamExpression}
             );
         ///.Lambda #Lambda1<System.Action`2[System.Object[],System.Object[]]>(
         ///    System.Object[] $__Input__,
@@ -409,14 +419,12 @@ public class Program
         ///    }
         ///}
 
-        Action<object[], object[]> lambda = lambdaExpression.Compile();
+        Action<object[], object[], object[]> lambda = lambdaExpression.Compile();
 
         var input = new object[] { 13, 2 };
         var output = new object[1];
 
-        lambda(input, output);
-
-
+        lambda(input, new object[] { }, output);
 
         Console.WriteLine($"Result = {output[0]}");
     }

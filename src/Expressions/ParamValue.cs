@@ -11,11 +11,11 @@ namespace NP.Utilities.Expressions
 
         public Expression? InputArrayAccessConvertExpr { get; private set; }
 
-        public ParameterExpression Expr { get; }
+        public ParameterExpression? Expr { get; }
 
-        public Expression AssignInputValueExpression { get; private set; }
+        public Expression? AssignInputValueExpression { get; private set; }
 
-        public Expression AssignOutputValueExpression { get; private set; }
+        public Expression? AssignOutputValueExpression { get; private set; }
 
         public ParameterExpression _outputArrayParams;
 
@@ -37,10 +37,15 @@ namespace NP.Utilities.Expressions
         // for reference type it will be corresponding non-reference type
         // e.g. for TheType=Int32& it will be Int32 (without ampersand at the end)
         public Type RealType { get; }
+        
+        public Expression? ReturnArrayAccessExpr { get; private set; }
 
-        public Expression OutputArrayAccessExpr { get; private set; }
-
-        public ParamValue(ParameterInfo param, ParameterExpression inputArrayParam, ParameterExpression outputArrayParams)
+        public ParamValue
+        (
+            ParameterInfo param, 
+            ParameterExpression inputArrayParam, 
+            ParameterExpression outputArrayParams,
+            ParameterExpression? returnArrayParams = null)
         {
             Param = param;
 
@@ -60,7 +65,7 @@ namespace NP.Utilities.Expressions
 
             if (IsReturn)
             {
-                Expr = Expression.Variable(RealType, MethodCaller.RETURN_PARAM_NAME);
+                ReturnArrayAccessExpr = returnArrayParams!.CreateArrayCellAccessExpression(0);
             }
             else
             {
@@ -79,7 +84,7 @@ namespace NP.Utilities.Expressions
 
         public bool IsIn => IsReturn ? false: Param.IsIn();
 
-        public bool IsOut => IsReturn ? true : Param.IsOut();
+        public bool IsOut => IsReturn ? false : Param.IsOut();
 
         private int _inputIdx;
         public int InputIdx
@@ -117,16 +122,8 @@ namespace NP.Utilities.Expressions
 
                 var outputArrayAccessExpr = _outputArrayParams.CreateArrayCellAccessExpression(_outputIdx);
 
-                if (IsReturn)
-                {
-                    OutputArrayAccessExpr = outputArrayAccessExpr;
-                }
-
-                else
-                {
-                    ///e.g. $__Output__[0] = (System.Object)$referenceInt
-                    AssignOutputValueExpression = Expression.Assign(outputArrayAccessExpr, Expression.Convert(Expr, typeof(object)));
-                }
+                ///e.g. $__Output__[0] = (System.Object)$referenceInt
+                AssignOutputValueExpression = Expression.Assign(outputArrayAccessExpr, Expression.Convert(Expr, typeof(object)));
             }
         }
 
