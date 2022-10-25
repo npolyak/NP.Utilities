@@ -19,7 +19,7 @@ namespace NP.Utilities.Expressions
 
         public ParameterExpression _outputArrayParams;
 
-        public Expression? InputParamExpression => IsIn ? (InputArrayAccessConvertExpr ?? Expr) : null;
+        public Expression? InputParamExpression => (InputArrayAccessConvertExpr ?? Expr);
 
 
         public object? Value { get; set; }

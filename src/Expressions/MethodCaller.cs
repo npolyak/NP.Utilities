@@ -12,21 +12,23 @@ namespace NP.Utilities.Expressions
         public const string OUTPUT_PARAM_NAME = "__Output__";
         public const string RETURN_PARAM_NAME = "__RETURN__";
 
-        public Expression<Action<object?[], object?[]>> Expr { get; }
-
-        public Action<object?[], object?[]> Method { get; private set; }
+        public Action<object?[], object?[], object?[]> Method { get; private set; }
 
         public Type DeclaringType => _methodInfo.DeclaringType!;
 
         public ParamValue[] ParamValues { get; }
 
-        public IParamValGetter[] InputParams { get; }
+        public ParamValue[] InputParams { get; }
 
-        public IParamValSetter[] OutputParams { get; }
+        public ParamValue[] OutputParams { get; }
+
+        public ParamValue[] ReturnParams { get; }
 
         public int NumberInputs => InputParams.Count();
 
         public int NumberOutputs => OutputParams.Count();
+
+        public int NumberReturns => ReturnParams.Count();
 
         public bool HasReturn => !_methodInfo.ReturnType.IsVoid();
 
@@ -41,6 +43,8 @@ namespace NP.Utilities.Expressions
         public ParameterExpression InputArrayParamsExpression { get; }
 
         public ParameterExpression OutputArrayParamsExpression { get; }
+
+        public ParameterExpression ReturnArrayParamsExpression { get; }
 
         public MethodCaller(MethodInfo methodInfo, object? instance = null)
         {
@@ -89,59 +93,85 @@ namespace NP.Utilities.Expressions
                 }
             }
 
-            CreateExpressionAndMethod();
+            ReturnArrayParamsExpression = Expression.Parameter(typeof(object[]), RETURN_PARAM_NAME);
 
             if (HasReturn)
             {
-                ReturnParamValue = new ParamValue(_methodInfo.ReturnParameter, InputArrayParamsExpression, OutputArrayParamsExpression);
+
+                ReturnParamValue = new ParamValue(_methodInfo.ReturnParameter, InputArrayParamsExpression, OutputArrayParamsExpression, ReturnArrayParamsExpression);
+
+                ReturnParams = new ParamValue[] { ReturnParamValue };
             }
+            else
+            {
+                ReturnParams = new ParamValue[] { };
+            }
+
+
+            CreateExpressionAndMethod();
         }
 
         private void CreateExpressionAndMethod()
         {
             IEnumerable<ParamValue> outputParams = ParamValues.Where(p => p.IsOut);
 
-            var callExpression = 
+            Expression callExpression = 
                 Expression.Call
                 (
                     _methodInfo, 
                     ParamValues
-                        .Where(p => p.InputParamExpression != null)
-                        .Select(p => p.InputParamExpression));
+                        .Where(p => p.InputParamExpression != null)!
+                        .Select(p => p.InputParamExpression)!);
+
+            if (HasReturn)
+            {
+                callExpression =
+                    Expression.Assign
+                    (
+                        ReturnParamValue.ReturnArrayAccessExpr!,
+                        Expression.Convert(callExpression, typeof(object))
+                    );
+            }
 
             IEnumerable<Expression> assignInputExpressions =
                 ParamValues
                     .Where(p => p.AssignInputValueExpression != null)
-                    .Select(p => p.AssignInputValueExpression);
+                    .Select(p => p.AssignInputValueExpression)!;
 
             IEnumerable<Expression> assignOutputExpressions =
-                ParamValues
-                    .Where(p => p.IsOut)
-                    .Select(p => p.AssignOutputValueExpression);
+                outputParams
+                    .Select(p => p.AssignOutputValueExpression)!;
 
 
             var blockVars = outputParams.Select(p => p.Expr).ToArray(); // variables
 
             List<Expression> blockExpressions = assignInputExpressions.ToList();
 
+            IEnumerable<Expression> returnExpressions =
+                ReturnParams.Select(p => p.ReturnArrayAccessExpr)!;
+
             blockExpressions.Add(callExpression);
             blockExpressions.AddRange(assignOutputExpressions);
+            blockExpressions.AddRange(returnExpressions);
 
+            Expression body;
 
-            Expression body =
-                Expression.Block
-                (
-                    //typeof(object[]),
-                    blockVars,
-                    blockExpressions);
+            if (HasReturn)
+            {
+                body = Expression.Block(blockVars!, blockExpressions);
+            }
+            else
+            {
+                body = Expression.Block(typeof(object), blockVars!, blockExpressions);
+            }
 
-            Expression<Action<object[], object?[]>> lambdaExpression =
-                Expression.Lambda<Action<object[], object?[]>>
+            Expression<Action<object[], object?[], object?[]>> lambdaExpression =
+                Expression.Lambda<Action<object[], object?[], object?[]>>
                 (
                     body,
-                    new ParameterExpression[] { InputArrayParamsExpression, OutputArrayParamsExpression }
+                    new ParameterExpression[] { InputArrayParamsExpression, OutputArrayParamsExpression, ReturnArrayParamsExpression }
                 );
-            Method = lambdaExpression.Compile();
+            Method = lambdaExpression.Compile()!;
         }
 
         public string MethodIdentifierStr
@@ -185,11 +215,19 @@ namespace NP.Utilities.Expressions
         public void Call()
         {
             object[] outputParams = new object[NumberOutputs];
-            Method(InputParams.Select(p => p.GetValue()).ToArray(), outputParams);
+
+            object[] returnParams = new object[NumberReturns];
+
+            Method(InputParams.Select(p => p.GetValue()).ToArray(), outputParams, returnParams);
 
             for (int i = 0; i < NumberOutputs; i++)
             {
                 OutputParams[i].SetValue(outputParams[i]);
+            }
+
+            for(int i = 0; i < NumberReturns; i++)
+            {
+                ReturnParams[i].SetValue(returnParams[i]);
             }
         }
     }

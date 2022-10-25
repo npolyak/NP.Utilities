@@ -6,9 +6,9 @@ using NP.Utilities;
 
 public class Program
 {
-    public static int Plus(int number1, int number2)
+    public static int Plus(int i1, int i2)
     {
-        return number1 + number2;
+        return i1 + i2;
     }
 
     public static void PlusRef(ref int referenceInt, int number2)
@@ -445,34 +445,81 @@ public class Program
 
         //RefSampleWithInputArgsConversion();
 
-        UsingParamValues();
+        //UsingParamValues();
 
 
         #region MethodCaller
-        //Type type = typeof(Program);
+        ///-----------------------------------------------------------------------------
+        Type type = typeof(Program);
 
-        //MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
-        //MethodCaller methodCaller = new MethodCaller(plusRefMethodInfo);
+        MethodInfo plusRefMethodInfo = type.GetMethod(nameof(Program.PlusRef))!;
+        MethodCaller methodCaller = new MethodCaller(plusRefMethodInfo);
 
-        //methodCaller.SetInputValue("referenceInt", 123);
-        //methodCaller.SetInputValue("number2", 34);
+        methodCaller.SetInputValue("referenceInt", 123);
+        methodCaller.SetInputValue("number2", 34);
 
-        //methodCaller.Call();
+        methodCaller.Call();
 
-        //int refInt = (int) methodCaller.GetOutputValue("referenceInt")!;
-        //Console.WriteLine(refInt);
+        int refInt = (int)methodCaller.GetOutputValue("referenceInt")!;
+        Console.WriteLine(refInt);
+        
+        ///-----------------------------------------------------------------------------
+        MethodInfo plusReturnMethodInfo =
+            type.GetMethod(nameof(Program.Plus))!;
+        MethodCaller outMethodCaller = new MethodCaller(plusReturnMethodInfo);
+        outMethodCaller.SetInputValue("i1", 12);
+        outMethodCaller.SetInputValue("i2", 4);
 
-        //MethodInfo plusOutMethodInfo = 
-        //    type.GetMethod(nameof(Program.PlusOut))!;
-        //MethodCaller outMethodCaller = new MethodCaller(plusOutMethodInfo);
-        //outMethodCaller.SetInputValue("i1", 12);
-        //outMethodCaller.SetInputValue("i2", 4);
+        outMethodCaller.Call();
 
-        //outMethodCaller.Call();
+        int returnInt = (int)outMethodCaller.GetReturnValue()!;
 
-        //int outInt = (int) outMethodCaller.GetOutputValue("result")!;
+        Console.WriteLine(returnInt);
 
-        //Console.WriteLine(outInt);
+        ///-----------------------------------------------------------------------------
+        MethodInfo plusOutMethodInfo =
+            type.GetMethod(nameof(Program.PlusOut))!;
+
+        MethodCaller plusOutMethodCaller = new MethodCaller(plusOutMethodInfo);
+        plusOutMethodCaller.SetInputValue("i1", 12);
+        plusOutMethodCaller.SetInputValue("i2", 4);
+
+        plusOutMethodCaller.Call();
+
+        int outInt = (int)plusOutMethodCaller.GetOutputValue("result");
+        //returnInt = (int)outMethodCaller.GetReturnValue()!;
+
+        Console.WriteLine($"outInt={outInt}");
+
+        ///-----------------------------------------------------------------------------
+        MethodInfo plusOutWithReturnMethodInfo =
+            type.GetMethod(nameof(Program.PlusOutWithReturn))!;
+
+        MethodCaller plusOutWithReturnMethodCaller = new MethodCaller(plusOutWithReturnMethodInfo);
+        plusOutWithReturnMethodCaller.SetInputValue("i1", 122);
+        plusOutWithReturnMethodCaller.SetInputValue("i2", 42);
+
+        plusOutWithReturnMethodCaller.Call();
+
+        outInt = (int)plusOutWithReturnMethodCaller.GetOutputValue("result");
+        returnInt = (int)plusOutWithReturnMethodCaller.GetReturnValue()!;
+
+        Console.WriteLine($"outInt={outInt}, result={returnInt}");
+
+        ///-----------------------------------------------------------------------------
+        MethodInfo plusRefWithReturnMethodInfo =
+            type.GetMethod(nameof(Program.PlusRefWithReturn))!;
+
+        MethodCaller plusRefWithReturnMethodCaller = new MethodCaller(plusRefWithReturnMethodInfo);
+        plusRefWithReturnMethodCaller.SetInputValue("referenceInt", 1222);
+        plusRefWithReturnMethodCaller.SetInputValue("number2", 422);
+
+        plusRefWithReturnMethodCaller.Call();
+
+        outInt = (int)plusRefWithReturnMethodCaller.GetOutputValue("referenceInt");
+        returnInt = (int)plusRefWithReturnMethodCaller.GetReturnValue()!;
+
+        Console.WriteLine($"outInt={outInt}, result={returnInt}");
 
         #endregion MethodCaller
     }
