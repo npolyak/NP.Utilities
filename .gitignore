@@ -15,3 +15,5 @@
 /Tests/ExpressionTest/bin/Debug/net6.0
 /src/bin/Debug/net6.0
 /Tests/ExpressionTest/.vs/ProjectEvaluation
+*.nupkg
+/src/.vs/ProjectEvaluation
