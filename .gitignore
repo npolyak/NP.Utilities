@@ -18,3 +18,4 @@
 *.nupkg
 /src/.vs/ProjectEvaluation
 /Tests/SerializationTest/.vs
+/src/bin
