@@ -123,19 +123,19 @@ namespace NP.Utilities
             return null;
         }
 
-        public static MemberInfo 
+        public static MemberInfo
             GetSingleMemberInfo
             (
-            this Type type, 
+            this Type type,
             string memberName,
             bool includeNonPublic = false,
             bool includeStatic = false)
         {
-            MemberInfo result = 
+            MemberInfo result =
                 type.GetSingleMemberInfoImpl
                 (
-                    memberName, 
-                    includeNonPublic, 
+                    memberName,
+                    includeNonPublic,
                     includeStatic);
 
             if (result == null)
@@ -186,7 +186,7 @@ namespace NP.Utilities
         (
             this Type type,
             string propName,
-            bool includeNonPublic = false, 
+            bool includeNonPublic = false,
             bool includeStatic = false)
         {
             BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, includeStatic);
@@ -328,10 +328,11 @@ namespace NP.Utilities
         {
             BindingFlags bindingFlags = GetBindingFlags(includeNonPublic, isStatic);
 
-            Type type = null;
-            if (isStatic)
+            Type? type = null;
+
+            if (obj is Type t)
             {
-                type = (Type)obj;
+                type = t;       
             }
             else
             {
@@ -353,12 +354,47 @@ namespace NP.Utilities
             return methodParamTypes.Zip(argRealTypes).All(item => item.First.IsAssignableFrom(item.Second));
         }
 
-        public static object CallMethodExtras(this object obj, string methodName, bool includeNonPublic, bool isStatic, params object[] args)
+        public static object CallMethodExtras
+        (
+            this object obj, 
+            string methodName, 
+            bool includeNonPublic, 
+            bool isStatic, 
+            params object[] args)
         {
-            MethodInfo methodInfo = obj.GetMethod(methodName, includeNonPublic, isStatic, args.Select(arg => arg.GetType()).ToArray());
+            MethodInfo methodInfo = 
+                obj.GetMethod
+                (
+                    methodName, 
+                    includeNonPublic, 
+                    isStatic, 
+                    args.Select(arg => arg.GetType()).ToArray());
 
             return methodInfo.Invoke(obj, args);
         }
+
+        public static object? CallMethodExtrasByType
+        (
+            this object obj,
+            Type type,
+            string methodName,
+            bool includeNonPublic,
+            bool isStatic,
+            params object[] args
+        )
+        {
+            MethodInfo methodInfo =
+                type.GetMethod
+                (
+                    methodName,
+                    includeNonPublic,
+                    isStatic,
+                    args.Select(arg => arg.GetType()).ToArray()
+                );
+
+            return methodInfo.Invoke(obj, args);
+        }
+           
 
         public static object CallMethod(this object obj, string methodName, params object[] args)
         {
