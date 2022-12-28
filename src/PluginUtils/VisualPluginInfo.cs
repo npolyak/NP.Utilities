@@ -2,7 +2,7 @@
 
 namespace NP.Utilities.PluginUtils
 {
-    public class VisualPluginInfo : ViewModelPluginInfo
+    public class VisualPluginInfo<TKey> : ViewModelPluginInfo<TKey>
     {
         public string ViewDataTemplateResourcePath { get; set; }
         public object ViewDataTemplateResourceKey { get; set; }
@@ -15,7 +15,7 @@ namespace NP.Utilities.PluginUtils
         public VisualPluginInfo
         (
             Type viewModelType, 
-            object viewModelKey,
+            TKey viewModelKey,
             string viewDatatemplateResourcePath,
             object viewDataTemplateResourceKey) 
             : 

@@ -2,11 +2,11 @@
 
 namespace NP.Utilities.PluginUtils
 {
-    public class ViewModelPluginInfo
+    public class ViewModelPluginInfo<TKey>
     {
         public Type ViewModelType { get; set; }
 
-        public object ViewModelKey { get; set; }
+        public TKey ViewModelKey { get; set; }
 
         public ViewModelPluginInfo()
         {
@@ -16,7 +16,7 @@ namespace NP.Utilities.PluginUtils
         public ViewModelPluginInfo
         (
             Type viewModelType,
-            object viewModelKey)
+            TKey viewModelKey)
         {
             ViewModelType = viewModelType;
             ViewModelKey = viewModelKey;
