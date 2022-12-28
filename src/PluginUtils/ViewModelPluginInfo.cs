@@ -6,7 +6,7 @@ namespace NP.Utilities.PluginUtils
     {
         public Type ViewModelType { get; set; }
 
-        public TKey ViewModelKey { get; set; }
+        public TKey ViewModelKey { get; set; } 
 
         public ViewModelPluginInfo()
         {
@@ -20,6 +20,22 @@ namespace NP.Utilities.PluginUtils
         {
             ViewModelType = viewModelType;
             ViewModelKey = viewModelKey;
+        }
+    }
+
+    public class ViewModelPluginInfo : ViewModelPluginInfo<object?>
+    {
+        public ViewModelPluginInfo()
+        {
+            
+        }
+
+        public ViewModelPluginInfo
+        (
+            Type viewModelType,
+            object? viewModelKey) : base(viewModelType, viewModelKey) 
+        {
+            
         }
     }
 }

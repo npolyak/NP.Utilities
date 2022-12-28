@@ -16,13 +16,32 @@ namespace NP.Utilities.PluginUtils
         (
             Type viewModelType, 
             TKey viewModelKey,
-            string viewDatatemplateResourcePath,
+            string viewDataTemplateResourcePath,
             object viewDataTemplateResourceKey) 
             : 
             base(viewModelType, viewModelKey)
         {
-            ViewDataTemplateResourcePath = viewDatatemplateResourcePath;
+            ViewDataTemplateResourcePath = viewDataTemplateResourcePath;
             ViewDataTemplateResourceKey = viewDataTemplateResourceKey;
+        }
+    }
+
+    public class VisualPluginInfo : VisualPluginInfo<object?>
+    {
+        public VisualPluginInfo()
+        {
+            
+        }
+
+        public VisualPluginInfo(
+            Type viewModelType,
+            object? viewModelKey,
+            string viewDataTemplateResourcePath,
+            object viewDataTemplateResourceKey)
+            :
+            base(viewModelType, viewModelKey, viewDataTemplateResourcePath, viewDataTemplateResourceKey)
+        {
+            
         }
     }
 }
