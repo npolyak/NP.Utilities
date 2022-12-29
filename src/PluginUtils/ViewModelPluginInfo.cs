@@ -38,4 +38,20 @@ namespace NP.Utilities.PluginUtils
             
         }
     }
+
+    public class ViewModelPluginInfoStr : ViewModelPluginInfo<string?>
+    {
+        public ViewModelPluginInfoStr()
+        {
+
+        }
+
+        public ViewModelPluginInfoStr
+        (
+            Type viewModelType,
+            string? viewModelKey) : base(viewModelType, viewModelKey)
+        {
+
+        }
+    }
 }

@@ -44,4 +44,22 @@ namespace NP.Utilities.PluginUtils
             
         }
     }
+
+    public class VisualPluginInfoStr : VisualPluginInfo<string?>
+    {
+        public VisualPluginInfoStr()
+        {
+
+        }
+        public VisualPluginInfoStr(
+            Type viewModelType,
+            string? viewModelKey,
+            string viewDataTemplateResourcePath,
+            object viewDataTemplateResourceKey)
+            :
+            base(viewModelType, viewModelKey, viewDataTemplateResourcePath, viewDataTemplateResourceKey)
+        {
+
+        }
+    }
 }
