@@ -54,4 +54,20 @@ namespace NP.Utilities.PluginUtils
 
         }
     }
+
+    public class ViewModelPluginInfoEnum : ViewModelPluginInfo<Enum>
+    {
+        public ViewModelPluginInfoEnum()
+        {
+
+        }
+
+        public ViewModelPluginInfoEnum
+        (
+            Type viewModelType,
+            Enum viewModelKey) : base(viewModelType, viewModelKey)
+        {
+
+        }
+    }
 }

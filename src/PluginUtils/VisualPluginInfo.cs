@@ -62,4 +62,22 @@ namespace NP.Utilities.PluginUtils
 
         }
     }
+
+    public class VisualPluginInfoEnum : VisualPluginInfo<Enum>
+    {
+        public VisualPluginInfoEnum()
+        {
+
+        }
+        public VisualPluginInfoEnum(
+            Type viewModelType,
+            Enum viewModelKey,
+            string viewDataTemplateResourcePath,
+            object viewDataTemplateResourceKey)
+            :
+            base(viewModelType, viewModelKey, viewDataTemplateResourcePath, viewDataTemplateResourceKey)
+        {
+
+        }
+    }
 }
