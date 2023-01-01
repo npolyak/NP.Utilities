@@ -1,8 +1,4 @@
-﻿
-using System;
-using System.Linq;
-
-namespace NP.Utilities
+﻿namespace NP.Utilities
 {
     public static class EnumUtils
     {
@@ -11,6 +7,11 @@ namespace NP.Utilities
             where TIn : struct, Enum
         {
             return Enum.GetValues<TOut>().First(v => v.ToString() == val.ToString());
+        }
+
+        public static int ToInt(this Enum e)
+        {
+            return Convert.ToInt32(e);
         }
     }
 }
