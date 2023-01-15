@@ -19,12 +19,12 @@ namespace NP.Utilities
 {
     public static class ObjUtils
     {
-        public static bool ReferenceEq(this object obj1, object obj2)
+        public static bool ReferenceEq(this object? obj1, object? obj2)
         {
             return ReferenceEquals(obj1, obj2);
         }
 
-        public static bool ObjEquals(this object obj1, object obj2)
+        public static bool ObjEquals(this object? obj1, object? obj2)
         {
             if (obj1 == obj2)
                 return true;
@@ -35,7 +35,7 @@ namespace NP.Utilities
             return false;
         }
 
-        public static int GetHashCodeExtension(this object obj)
+        public static int GetHashCodeExtension(this object? obj)
         {
             if (obj == null)
                 return 0;
@@ -44,7 +44,7 @@ namespace NP.Utilities
         }
 
 
-        public static T[] ObjToCollection<T>(this T obj)
+        public static T[] ObjToCollection<T>(this T? obj)
         {
             if (obj == null)
             {
@@ -56,12 +56,12 @@ namespace NP.Utilities
 
 
 
-        public static string ToStr(this object obj)
+        public static string ToStr(this object? obj)
         {
             if (obj == null)
                 return string.Empty;
 
-            return obj.ToString();
+            return obj.ToString()!;
         }
 
         public static bool IsNullOrEmptyCollection(this object obj)

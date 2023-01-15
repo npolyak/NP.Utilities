@@ -432,8 +432,22 @@ namespace NP.Utilities
         /// WE ASSUME, THERE ARE NO DUPLICATION IN coll1 collection !!! Otherwise - this won't work
         /// </summary>
         /// <returns></returns>
-        public static bool AreEquivalentCollections<T>(this IEnumerable<T> coll1, IEnumerable<T> coll2, Func<T, T, bool> comparisonFn)
+        public static bool AreEquivalentCollections<T>
+        (
+            this IEnumerable<T> coll1,
+            IEnumerable<T> coll2,
+            Func<T, T, bool>? comparisonFn = null)
         {
+            bool AreTheSame(T v1, T v2)
+            {
+                return v1.ObjEquals(v2);
+            }
+
+            if (comparisonFn == null)
+            {
+                comparisonFn = AreTheSame;
+            }
+
             if (coll1.IsNullOrEmptyCollection())
                 return coll2.IsNullOrEmptyCollection();
 
@@ -452,6 +466,15 @@ namespace NP.Utilities
             }
 
             return true;
+        }
+
+        public static bool AreEquivalent<T>
+        (
+            this IEnumerable<T> coll1,
+            IEnumerable<T> coll2,
+            Func<T, T, bool>? comparisonFn = null)
+        {
+            return AreEquivalentCollections(coll1, coll2, comparisonFn);
         }
 
         public static bool IsInValCollection<T>(this T obj, IEnumerable<object> valueCollection)
