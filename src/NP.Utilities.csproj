@@ -5,7 +5,7 @@
 		<PackageId>NP.Utilities</PackageId>
 		<Authors>Nick Polyak, Ph. D.</Authors>
 		<Company>AWebPros</Company>
-		<Version>1.0.19</Version>
+		<Version>1.0.21</Version>
 		<Description>Contains the functionality basic utilities</Description>
 		<Copyright>Nick Polyak 2023</Copyright>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -14,7 +14,11 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>none</DebugType>
+		<DebugType>embedded</DebugType>
+		<Optimize>False</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DebugType>portable</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="*.nupkg" />

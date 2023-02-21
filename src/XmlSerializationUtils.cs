@@ -46,15 +46,23 @@ namespace NP.Utilities
             return stringBuilder.ToString().ReplaceEncoding();
         }
 
-        public static void SerializeToFile<T>(this T objToSerialize, string filePath, params Type[] extraTypes)
-        {
-            string serializationStr = objToSerialize.Serialize<T>(extraTypes);
 
-            using StreamWriter writer = new StreamWriter(filePath);
+        public static void SerializeToStream<T>(this T objToSerialize, Stream stream, params Type[] extraTypes)
+        {
+            string serializationStr = objToSerialize.Serialize(extraTypes);
+
+            using StreamWriter writer = new StreamWriter(stream);
 
             writer.Write(serializationStr);
 
             writer.Flush();
+        }
+
+        public static void SerializeToFile<T>(this T objToSerialize, string filePath, params Type[] extraTypes)
+        {
+            using FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+
+            SerializeToStream(objToSerialize, fileStream, extraTypes);  
         }
 
         public static T Deserialize<T>(string xmlStr, bool isAsync = false, params Type[] extraTypes)
@@ -90,13 +98,20 @@ namespace NP.Utilities
             }
         }
 
-        public static T DeserializeFromFile<T>(string filePath, bool isAsync = false, params Type[] extraTypes)
+        public static T DeserializeFromStream<T>(Stream stream, bool isAsync = false, params Type[] extraTypes)
         {
-            using StreamReader reader = new StreamReader(filePath);
+            using StreamReader reader = new StreamReader(stream);
 
             string serializationStr = reader.ReadToEnd();
 
             return Deserialize<T>(serializationStr, isAsync, extraTypes);
+        }
+
+        public static T DeserializeFromFile<T>(string filePath, bool isAsync = false, params Type[] extraTypes)
+        {
+            using FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            return DeserializeFromStream<T>(fileStream, isAsync, extraTypes);   
         }
 
         static string ReplaceEncoding(this string str)
