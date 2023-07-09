@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NP.Utilities
 {
-    public class KeyedDisposables<TKey> : IDisposable
+    public class KeyedDisposables<TKey> : IDisposable where TKey : notnull
     {
         private Dictionary<TKey, IDisposable> _dict = new Dictionary<TKey, IDisposable>();
 
@@ -19,7 +19,7 @@ namespace NP.Utilities
 
         public void Remove(TKey key)
         {
-            if (_dict.Remove(key, out IDisposable d))
+            if (_dict.Remove(key, out IDisposable? d))
             {
                 d?.Dispose();
             }
