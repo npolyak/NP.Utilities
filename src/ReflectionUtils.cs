@@ -265,9 +265,16 @@ namespace NP.Utilities
         (
             this object obj,
             string propName,
-            bool includeNonPublic = false)
+            bool includeNonPublic = false,
+            Type realType = null)
         {
-            PropertyInfo sourcePropInfo = obj.GetType().GetPropInfoFromType(propName, includeNonPublic);
+            if (realType == null)
+            {
+                realType = obj.GetType();
+            }
+
+            PropertyInfo sourcePropInfo = 
+                realType.GetPropInfoFromType(propName, includeNonPublic);
 
             return sourcePropInfo;
         }
@@ -317,9 +324,15 @@ namespace NP.Utilities
             fieldInfo.SetValue(obj, val);
         }
 
-        public static void SetPropValue(this object obj, string propName, object val, bool includeNonPublic = false)
+        public static void SetPropValue
+        (
+            this object obj, 
+            string propName, 
+            object val, 
+            bool includeNonPublic = false,
+            Type realType = null)
         {
-            PropertyInfo propInfo = GetPropInfo(obj, propName, includeNonPublic);
+            PropertyInfo propInfo = GetPropInfo(obj, propName, includeNonPublic, realType);
 
             propInfo.SetValue(obj, val, null);
         }
