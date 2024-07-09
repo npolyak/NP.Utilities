@@ -12,9 +12,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace NP.Utilities
@@ -29,6 +26,45 @@ namespace NP.Utilities
         public const char BINDING_PATH_LINK_SEPARATOR = '/';
 
         public readonly static char[] WHITESPACE_CHARS = { ' ', '\n', '\t', '\r' };
+
+        public static string[] SplitAtWhiteSpace(this string str)
+        {
+            if (str == null)
+                return Array.Empty<string>();
+
+            return str.Split(WHITESPACE_CHARS, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        public static IEnumerable<string> SplitAtCapitalLetter(this string str)
+        {
+            if (str == null)
+                yield break;
+
+            int len = str.Length;
+
+            int startIdx = 0;
+            int endIdx = 1;
+
+            while (endIdx <= len)
+            {
+                while (endIdx < len)
+                {
+                    if (char.IsUpper(str[endIdx]))
+                        break;
+
+                    endIdx++;
+                }
+
+                yield return str.Substring(startIdx, endIdx - startIdx);
+                startIdx = endIdx;
+                endIdx = startIdx + 1;
+            }
+        }
+
+        public static string PhraseFromName(this string name)
+        {
+            return string.Join(' ', name.SplitAtCapitalLetter());
+        }
 
         public static string NullToEmpty(this string str)
         {
