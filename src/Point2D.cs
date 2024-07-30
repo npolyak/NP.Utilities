@@ -9,10 +9,10 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 //
-using System;
-using System.ComponentModel;
-using System.Linq;
+global using Point2D = NP.Utilities.Point2D<double>;
+using System.Numerics;
 using System.Xml.Serialization;
+
 
 namespace NP.Utilities
 {
@@ -20,14 +20,19 @@ namespace NP.Utilities
         where T : IComparable<T>
     {
         [XmlAttribute]
-        public T X { get; set; } = default;
+        public T X { get; }
 
         [XmlAttribute]
-        public T Y { get; set; } = default;
+        public T Y { get; }
 
         public Point2D()
         {
 
+        }
+
+        public Point2D<T> Copy()
+        {
+            return new Point2D<T>(X, Y);
         }
 
         public Point2D(T x, T y)
@@ -57,40 +62,15 @@ namespace NP.Utilities
         }
     }
 
-    [TypeConverter(typeof(Point2DTypeConverter))]
-    public class Point2D : Point2D<double>
-    {
-        public Point2D()
-        {
-
-        }
-
-        public Point2D(double x, double y) : base(x, y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public Point2D(string str)
-        {
-            this.SetFromStr(str);
-        }
-
-        public override string ToString()
-        {
-            return $"({X}, {Y})";
-        }
-
-        public double AbsSquared()
-        {
-            return X * X + Y * Y;
-        }
-    }
+    //[TypeConverter(typeof(Point2DTypeConverter))]
+    //public class Point2D : Point2D<double>
+    //{
+    //}
 
 
     public static class Point2DHelper
     {
-        public static void SetFromStr(this Point2D p, string str)
+        public static Point2D SetFromStr(string str)
         {
             string[] split =
                 str.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
@@ -99,15 +79,12 @@ namespace NP.Utilities
                 throw new Exception($"Format Error: Cannot parse string '{str}' as Point2D");
 
 
-            p.X = double.Parse(split[0]);
-            p.Y = double.Parse(split[1]);
+            return new Point2D(double.Parse(split[0]), double.Parse(split[1]));
         }
 
         public static Point2D ParseToPoint2D(this string str)
         {
-            Point2D p = new Point2D();
-
-            SetFromStr(p, str);
+            Point2D p = SetFromStr(str);
 
             return p;
         }
@@ -137,32 +114,81 @@ namespace NP.Utilities
 
     public static class Point2DUtils
     {
-        public static Point2D ToNonNegative(this Point2D point)
+        public static Point2D<T> ToNonNegative<T>(this Point2D<T> point)
+            where T: INumber<T>
         {
-            return new Point2D(point.X.NonNegative(), point.Y.NonNegative());
+            return new Point2D<T>(point.X.NonNegative(), point.Y.NonNegative());
         }
 
-        public static Point2D Transform(this Point2D pt1, Point2D pt2, Func<double, double, double> transformFn)
+        public static Point2D<T> Transform<T>(this Point2D<T> pt1, Point2D<T> pt2, Func<T, T, T> transformFn)
+            where T: INumber<T>
         {
-            return new Point2D(transformFn(pt1.X, pt2.X), transformFn(pt1.Y, pt2.Y));
+            return new Point2D<T>(transformFn(pt1.X, pt2.X), transformFn(pt1.Y, pt2.Y));
         }
 
-        public static Point2D Min(this Point2D pt1, Point2D pt2) =>
-            pt1.Transform(pt2, Math.Min);
+        public static Point2D<T> Min<T>(this Point2D<T> pt1, Point2D<T> pt2)
+            where T : INumber<T> 
+            =>
+            pt1.Transform(pt2, T.Min);
 
 
-        public static Point2D Max(this Point2D pt1, Point2D pt2) =>
-            pt1.Transform(pt2, Math.Max);
+        public static Point2D<T> Max<T>(this Point2D<T> pt1, Point2D<T> pt2) 
+            where T : INumber<T> 
+            =>
+            pt1.Transform(pt2, T.Max);
 
-        public static Point2D Plus(this Point2D pt1, Point2D pt2) =>
+        public static Point2D<T> Plus<T>(this Point2D<T> pt1, Point2D<T> pt2)
+            where T : INumber<T> 
+            =>
             pt1.Transform(pt2, (num1, num2) => num1 + num2);
 
-        public static Point2D Minus(this Point2D pt1, Point2D pt2) =>
+        public static Point2D<T> Minus<T>(this Point2D<T> pt1, Point2D<T> pt2)
+            where T: INumber<T>
+            =>
             pt1.Transform(pt2, (num1, num2) => num1 - num2);
 
-        public static Point2D ToAbs(this Point2D pt)
+        public static Point2D<T> Times<TPoint, T>(this TPoint point, T scale)
+            where TPoint : Point2D<T>
+            where T : INumber<T>
         {
-            return new Point2D(Math.Abs(pt.X), Math.Abs(pt.Y));
+            return new Point2D<T>(point.X * scale, point.Y * scale);
+        }
+
+        public static Point2D<T> ToAbs<T>(this Point2D<T> pt)
+            where T : INumber<T>
+        {
+            return new Point2D<T>(T.Abs(pt.X), T.Abs(pt.Y));
+        }
+
+
+        public static T AbsSquared<T>(this Point2D<T> p)
+            where T : INumber<T>
+        {
+            return p.X * p.X + p.Y * p.Y;
+        }
+
+        public static Point2D<T> ScaleX<T>(this Point2D<T> p, T scale)
+            where T : INumber<T>
+        {
+            return new Point2D<T>(p.X * scale, p.Y);
+        }
+
+        public static Point2D<T> ScaleY<T>(this Point2D<T> p, T scale) 
+            where T : INumber<T>
+        {
+            return new Point2D<T>(p.X, p.Y * scale);
+        }
+
+        public static Point2D<T> AddX<T>(this Point2D<T> p, T add)
+            where T : INumber<T>
+        {
+            return new Point2D<T>(p.X + add, p.Y);
+        }
+
+        public static Point2D<T> AddY<T>(this Point2D<T> p, T add)
+            where T : INumber<T>
+        {
+            return new Point2D<T>(p.X, p.Y + add);
         }
 
         private static BoolPoint2D ComparePoints<T>(this Point2D<T> p1, Point2D<T> p2, Func<T, T, bool> compareFn)
@@ -189,7 +215,6 @@ namespace NP.Utilities
         {
             return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) > 0);
         }
-
 
         public static BoolPoint2D GreaterOrEqual<T>(this Point2D<T> p1, Point2D<T> p2)
             where T : IComparable<T>

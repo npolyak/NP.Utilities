@@ -21,7 +21,7 @@ namespace NP.Utilities
             }
 
             double x = values[0].ToDouble("Point2D.X");
-            double y = values[0].ToDouble("Point2D.Y");
+            double y = values[1].ToDouble("Point2D.Y");
 
             return new Point2D(x, y);
         }

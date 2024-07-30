@@ -12,6 +12,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 
 namespace NP.Utilities
 {
@@ -25,10 +26,13 @@ namespace NP.Utilities
         public const int Thousand = 1000;
 
 
-        public static double NonNegative(this double d)
+        public static T NonNegative<T>(this T d)
+            where T : INumber<T>
         {
-            if (d < 0)
-                d = 0;
+            int sign = T.Sign(d);
+
+            if (sign < 0)
+                d = T.Zero;
 
             return d;
         }
