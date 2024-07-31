@@ -93,15 +93,18 @@ namespace NP.Utilities
 
             if (fromStart)
             {
-                Point2D<T> endPoint = rect.StartPoint.AddX(width);
+                Point2D<T> endPoint = new Point2D<T>(rect.StartPoint.X + width, rect.EndPoint.Y);
 
-                return new Rect2D<T>(rect.StartPoint, rect.EndPoint);
+                var result = new Rect2D<T>(rect.StartPoint, endPoint);
+                return result;
             }
             else // from end
             {
-                Point2D<T> startPoint = rect.EndPoint.AddX(-width);
+                Point2D<T> startPoint = new Point2D<T>(rect.EndPoint.X - width, rect.StartPoint.Y);
 
-                return new Rect2D<T>(startPoint, rect.EndPoint);
+                var result = new Rect2D<T>(startPoint, rect.EndPoint);
+
+                return result;
             }
         }
 
@@ -112,13 +115,13 @@ namespace NP.Utilities
 
             if (fromStart)
             {
-                Point2D<T> endPoint = rect.StartPoint.AddY(height);
+                Point2D<T> endPoint = new Point2D<T>(rect.EndPoint.X, rect.StartPoint.Y + height);
 
                 return new Rect2D<T>(rect.StartPoint, endPoint);
             }
             else // from end
             {
-                Point2D<T> startPoint = rect.EndPoint.AddY(-height);
+                Point2D<T> startPoint = new Point2D<T>(rect.StartPoint.X, rect.EndPoint.Y - height);
 
                 return new Rect2D<T>(startPoint, rect.EndPoint);
             }
@@ -133,7 +136,9 @@ namespace NP.Utilities
 
             bool fromStart = sideToScaleTo.IsStart();
 
-            return sideToScaleTo.IsX() ? rect.ScaleWidth(scale, fromStart) : rect.ScaleHeight(scale, fromStart);
+            var result = sideToScaleTo.IsX() ? rect.ScaleWidth(scale, fromStart) : rect.ScaleHeight(scale, fromStart);
+
+            return result;
         }
     }
 }
