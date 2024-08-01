@@ -11,6 +11,7 @@
 //
 global using Point2D = NP.Utilities.Point2D<double>;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 
@@ -220,6 +221,39 @@ namespace NP.Utilities
             where T : IComparable<T>
         {
             return p1.ComparePoints(p2, (d1, d2) => d1.CompareTo(d2) >= 0);
+        }
+
+        private static T? RelativePosition<T>(this T start, T end, T position)
+            where T : notnull, INumber<T>
+        {
+            if (position < start || position > end || start == end)
+                return default(T?);
+
+            return (position - start) / (end - start);
+        }
+
+        private static (Side1D, double) RelativeDistanceToNearestSide(this double start, double end, double position) 
+        {
+            double? relativeDistance = start.RelativePosition(end, position);
+
+            if (relativeDistance == null)
+            {
+                return (Side1D.Center, -1);
+            }
+
+            if (relativeDistance < 0.5)
+            {
+                return (Side1D.Start, relativeDistance.Value);
+            }
+            else
+            {
+                return (Side1D.End, 1 - relativeDistance.Value);
+            }
+        }
+
+        public static (Side1D, double) GetNearestSideAndRelativePosition(this Point2D startEnd, double position)
+        {
+            return startEnd.X.RelativeDistanceToNearestSide(startEnd.Y, position);
         }
     }
 }

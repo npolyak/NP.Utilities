@@ -28,6 +28,12 @@ namespace NP.Utilities
         public T Height =>
             EndPoint.Y - StartPoint.Y;
 
+        public Point2D<T> HorizontalStartEnd => 
+            new Point2D<T>(StartPoint.X, EndPoint.X);
+
+        public Point2D<T> VerticalStartEnd => 
+            new Point2D<T>(StartPoint.Y, EndPoint.Y);
+
         public Rect2D()
         {
 
@@ -139,6 +145,37 @@ namespace NP.Utilities
             var result = sideToScaleTo.IsX() ? rect.ScaleWidth(scale, fromStart) : rect.ScaleHeight(scale, fromStart);
 
             return result;
+        }
+
+        private static Side1D RelativePositionToSide(this double relativePosition)
+        {
+            return (relativePosition <= 0.25) ?
+                 Side1D.Start : (relativePosition >= 0.75) ? Side1D.End : Side1D.Center;
+        }
+
+        public static Side2D GetSide(this Rect2D rect, Point2D position)
+        {
+            if (!rect.ContainsPoint(position))
+                return Side2D.Center; // default
+
+            Side1D horizontalNearestSide = Side1D.Center, verticalNearestSide = Side1D.Center;
+            double relativePositionToNearestHorizontalSide, relativePositionToNearestVerticalSide;
+
+            (horizontalNearestSide, relativePositionToNearestHorizontalSide) = rect.HorizontalStartEnd.GetNearestSideAndRelativePosition(position.X);
+            (verticalNearestSide, relativePositionToNearestVerticalSide) = rect.VerticalStartEnd.GetNearestSideAndRelativePosition(position.Y);
+
+            if (relativePositionToNearestHorizontalSide <= relativePositionToNearestVerticalSide)
+            {
+                if (relativePositionToNearestHorizontalSide < 0.25)
+                    return horizontalNearestSide.GetSide2D(true);
+            }
+            else
+            {
+                if (relativePositionToNearestVerticalSide < 0.25)
+                    return verticalNearestSide.GetSide2D(false);
+            }
+
+            return Side2D.Center;
         }
     }
 }
