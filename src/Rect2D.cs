@@ -177,5 +177,17 @@ namespace NP.Utilities
 
             return Side2D.Center;
         }
+
+        public static Rect2D<T> CreateRectFromSize<T>(this Point2D<T> size)
+            where T : notnull, INumber<T>
+        {
+            return new Rect2D<T>(new Point2D<T>(), new Point2D<T>(size.X, size.Y));
+        }
+
+        public static Point2D<T> LocationWithinBoundaries<T>(this Rect2D<T> rect, Point2D<T> position)
+            where T : notnull, INumber<T>
+        {
+            return new Point2D<T>(rect.HorizontalStartEnd.LocationWithinBoundaries(position.X), rect.VerticalStartEnd.LocationWithinBoundaries(position.Y));
+        }
     }
 }

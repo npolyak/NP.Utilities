@@ -255,5 +255,16 @@ namespace NP.Utilities
         {
             return startEnd.X.RelativeDistanceToNearestSide(startEnd.Y, position);
         }
+
+        public static T LocationWithinBoundaries<T>(this Point2D<T> segment, T position)
+            where T : notnull, INumber<T>
+        {
+            if (position < segment.X)
+                position = segment.X;
+            else if (position > segment.Y)
+                position = segment.Y;
+
+            return position;
+        }
     }
 }
