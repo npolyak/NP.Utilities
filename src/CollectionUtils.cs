@@ -259,7 +259,7 @@ namespace NP.Utilities
                 yield return obj;
         }
 
-        public static IEnumerable<T> NullToEmpty<T>(this IEnumerable<T> collection)
+        public static IEnumerable<T> NullToEmpty<T>(this IEnumerable<T>? collection)
         {
             if (collection == null)
                 return Enumerable.Empty<T>();
