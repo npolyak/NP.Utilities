@@ -64,7 +64,7 @@ namespace NP.Utilities
             return obj.ToString()!;
         }
 
-        public static bool IsNullOrEmptyCollection(this object obj)
+        public static bool IsNullOrEmptyCollection(this object? obj)
         {
             return obj == null || (obj is IEnumerable enumerable && enumerable.IsNullOrEmpty());
         }
