@@ -251,18 +251,18 @@ namespace NP.Utilities
             }
         }
 
-        public static (Side1D, double) GetNearestSideAndRelativePosition(this Point2D startEnd, double position)
+        public static (Side1D, double) GetNearestSideAndRelativePosition(this Segment1D<double> startEnd, double position)
         {
-            return startEnd.X.RelativeDistanceToNearestSide(startEnd.Y, position);
+            return startEnd.Start.RelativeDistanceToNearestSide(startEnd.End, position);
         }
 
-        public static T LocationWithinBoundaries<T>(this Point2D<T> segment, T position)
+        public static T LocationWithinBoundaries<T>(this Segment1D<T> segment, T position)
             where T : notnull, INumber<T>
         {
-            if (position < segment.X)
-                position = segment.X;
-            else if (position > segment.Y)
-                position = segment.Y;
+            if (position < segment.Start)
+                position = segment.Start;
+            else if (position > segment.End)
+                position = segment.End;
 
             return position;
         }

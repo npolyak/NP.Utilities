@@ -28,11 +28,11 @@ namespace NP.Utilities
         public T Height =>
             EndPoint.Y - StartPoint.Y;
 
-        public Point2D<T> HorizontalStartEnd => 
-            new Point2D<T>(StartPoint.X, EndPoint.X);
+        public Segment1D<T> HorizontalStartEnd => 
+            new Segment1D<T>(StartPoint.X, EndPoint.X);
 
-        public Point2D<T> VerticalStartEnd => 
-            new Point2D<T>(StartPoint.Y, EndPoint.Y);
+        public Segment1D<T> VerticalStartEnd => 
+            new Segment1D<T>(StartPoint.Y, EndPoint.Y);
 
         public Rect2D()
         {
@@ -43,6 +43,12 @@ namespace NP.Utilities
         {
             this.StartPoint = startPoint;
             this.EndPoint = endPoint;
+        }
+
+        public Rect2D(T startX, T startY, T width, T height) : 
+            this(new Point2D<T>(startX, startY), new Point2D<T>(startX + width, startY + height))
+        {
+            
         }
 
 
@@ -147,11 +153,6 @@ namespace NP.Utilities
             return result;
         }
 
-        private static Side1D RelativePositionToSide(this double relativePosition)
-        {
-            return (relativePosition <= 0.25) ?
-                 Side1D.Start : (relativePosition >= 0.75) ? Side1D.End : Side1D.Center;
-        }
 
         public static Side2D GetSide(this Rect2D rect, Point2D position)
         {
