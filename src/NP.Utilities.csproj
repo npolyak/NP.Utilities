@@ -4,7 +4,7 @@
 		<PackageId>NP.Utilities</PackageId>
 		<Authors>Nick Polyak, Ph. D.</Authors>
 		<Company>AWebPros</Company>
-		<Version>1.0.29</Version>
+		<Version>1.0.30</Version>
 		<Description>Contains the functionality basic utilities</Description>
 		<Copyright>Nick Polyak 2023</Copyright>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
