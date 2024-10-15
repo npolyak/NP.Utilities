@@ -19,3 +19,4 @@
 /src/.vs/ProjectEvaluation
 /Tests/SerializationTest/.vs
 /src/bin
+*.DS_Store
