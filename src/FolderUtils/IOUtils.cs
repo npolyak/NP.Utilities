@@ -31,7 +31,7 @@ namespace NP.Utilities.FolderUtils
 
             foreach (string pathLink in pathLinks)
             {
-                partialPath += pathLink + DirEndChar;
+                partialPath = Path.Combine(partialPath, pathLink);
 
                 if (!Directory.Exists(partialPath))
                 {
