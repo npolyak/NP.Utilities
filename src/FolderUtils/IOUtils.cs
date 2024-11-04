@@ -24,10 +24,14 @@ namespace NP.Utilities.FolderUtils
             if (path == null)
                 return;
 
-            string[] pathLinks =
-                path.Split(new[] { DirEndChar, DirAltEndChar }, StringSplitOptions.RemoveEmptyEntries);
+            path = path.Trim();
 
-            string partialPath = string.Empty;
+            string[] pathLinks =
+                path.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+            string partialPath =
+                path.StartsWith(Path.DirectorySeparatorChar) || path.StartsWith(Path.AltDirectorySeparatorChar) 
+                    ? "" + Path.DirectorySeparatorChar : string.Empty;
 
             foreach (string pathLink in pathLinks)
             {
