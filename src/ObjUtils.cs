@@ -9,11 +9,8 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace NP.Utilities
 {
