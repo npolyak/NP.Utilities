@@ -1,6 +1,6 @@
 ﻿namespace NP.Utilities.Attributes
 {
-    public enum BrickDataPointDirection
+    public enum TileDataPointDirection
     {
         Target,
         Source,
@@ -9,25 +9,25 @@
 
     public static class DataPointExtensions
     {
-        public static bool IsSource(this BrickDataPointDirection dataPointDirection)
+        public static bool IsSource(this TileDataPointDirection dataPointDirection)
         {
-            return dataPointDirection == BrickDataPointDirection.Source || 
-                   dataPointDirection == BrickDataPointDirection.SourceAndTarget;
+            return dataPointDirection == TileDataPointDirection.Source || 
+                   dataPointDirection == TileDataPointDirection.SourceAndTarget;
         }
 
-        public static bool IsTarget(this BrickDataPointDirection dataPointDirection)
+        public static bool IsTarget(this TileDataPointDirection dataPointDirection)
         {
-            return (dataPointDirection == BrickDataPointDirection.Target) ||
-                   (dataPointDirection == BrickDataPointDirection.SourceAndTarget);
+            return (dataPointDirection == TileDataPointDirection.Target) ||
+                   (dataPointDirection == TileDataPointDirection.SourceAndTarget);
         }
 
-        public static BrickDataPointDirection Invert(this BrickDataPointDirection dataPointDirection)
+        public static TileDataPointDirection Invert(this TileDataPointDirection dataPointDirection)
         {
             return dataPointDirection switch
             {
-                BrickDataPointDirection.Target => BrickDataPointDirection.Source,
-                BrickDataPointDirection.Source => BrickDataPointDirection.Target,
-                _ => BrickDataPointDirection.SourceAndTarget
+                TileDataPointDirection.Target => TileDataPointDirection.Source,
+                TileDataPointDirection.Source => TileDataPointDirection.Target,
+                _ => TileDataPointDirection.SourceAndTarget
             };
         }
     }

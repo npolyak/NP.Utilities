@@ -10,9 +10,9 @@ namespace NP.Utilities.Attributes
             Inherited = true
         )
     ]
-    public class BrickDataPointAttribute : Attribute
+    public class TileDataPointAttribute : Attribute
     {
-        public BrickDataPointDirection Direction { get; init; }
+        public TileDataPointDirection Direction { get; init; }
 
         public string? TriggersActionName { get; init; } = null;
 
