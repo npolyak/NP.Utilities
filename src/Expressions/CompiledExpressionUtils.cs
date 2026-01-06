@@ -20,21 +20,21 @@ namespace NP.Utilities.Expressions
 {
     public static class CompiledExpressionUtils
     {
-        static DoubleParamMap<Type, string, Func<object, object>> _untypedGettersCache =
-            new DoubleParamMap<Type, string, Func<object, object>>();
+        static DoubleParamMap<Type, string, object> _untypedGettersCache =
+            new DoubleParamMap<Type, string, object>();
 
 
-        public static Func<object, object> GetUntypedCSPropertyGetterByObjType
+        public static Func<object, TValue> GetUntypedCSPropertyGetterByObjType<TValue>
         (
             this Type objType,
             string propertyName
         )
         {
-            Func<object, object> result;
+            object resultObj;
 
-            if (_untypedGettersCache.TryGetValue(objType, propertyName, out result))
+            if (_untypedGettersCache.TryGetValue(objType, propertyName, out resultObj))
             {
-                return result;
+                return (Func<object, TValue>) resultObj;
             }
 
             ParameterExpression paramExpression = Expression.Parameter(typeof(object));
@@ -43,23 +43,37 @@ namespace NP.Utilities.Expressions
             Expression propertyGetterExpression =
                 Expression.Property(typedObjectExpression, propertyName);
 
-            UnaryExpression valueCastExpression = Expression.Convert(propertyGetterExpression, typeof(object));
+            UnaryExpression valueCastExpression = 
+                Expression.Convert(propertyGetterExpression, typeof(TValue));
 
-            result = Expression.Lambda<Func<object, object>>(valueCastExpression, paramExpression).Compile();
+            Func<object, TValue> result = 
+                Expression.Lambda<Func<object, TValue>>(valueCastExpression, paramExpression).Compile();
 
             _untypedGettersCache.AddKeyValue(objType, propertyName, result);
 
             return result;
         }
 
-        public static Func<object, object> GetUntypedCSPropertyGetter
+        public static Func<object, object> GetUntypedCSPropertyGetterByObjType
+        (
+            this Type objType,
+            string propertyName
+        ) => objType.GetUntypedCSPropertyGetterByObjType<object>(propertyName);
+
+        public static Func<object, TValue> GetUntypedCSPropertyGetter<TValue>
         (
             object obj,
             string propertyName
         )
         {
-            return GetUntypedCSPropertyGetterByObjType(obj?.GetType(), propertyName);
+            return GetUntypedCSPropertyGetterByObjType<TValue>(obj?.GetType(), propertyName);
         }
+
+        public static Func<object, object> GetUntypedCSPropertyGetter
+        (
+            object obj,
+            string propertyName
+        ) => GetUntypedCSPropertyGetter<object>(obj, propertyName);
 
         //typed getters cache
         static DoubleParamMap<Type, string, object> _typedGettersCache =
@@ -97,7 +111,7 @@ namespace NP.Utilities.Expressions
                 ParameterExpression objParamExpression,
                 ParameterExpression valueParamExpression,
                 MemberExpression propertyExpression,
-                UnaryExpression valueCastExpression) GetExpressions
+                UnaryExpression valueCastExpression) GetExpressions<TValue>
             (
                 this Type objType,
                 string propertyName,
@@ -108,47 +122,117 @@ namespace NP.Utilities.Expressions
 
             UnaryExpression objCastExpression = Expression.Convert(objParamExpression, objType);
 
-            ParameterExpression valueParamExpression = Expression.Parameter(typeof(object));
+            ParameterExpression valueParamExpression = Expression.Parameter(typeof(TValue));
 
-            UnaryExpression valueCastExpression = Expression.Convert(valueParamExpression, propItemType);
+            UnaryExpression valueCastExpression =
+                Expression.Convert(valueParamExpression, propItemType);
 
-            MemberExpression propertyExpression = Expression.Property(objCastExpression, propertyName);
+            MemberExpression propertyExpression = 
+                Expression.Property(objCastExpression, propertyName);
 
             return (objParamExpression, valueParamExpression, propertyExpression, valueCastExpression);
         }
 
-        static DoubleParamMap<Type, string, Action<object, object>> _untypedSettersCache =
-            new DoubleParamMap<Type, string, Action<object, object>>();
+        private static
+        (
+            ParameterExpression objParamExpression,
+            ParameterExpression valueParamExpression,
+            MemberExpression propertyExpression,
+            UnaryExpression valueCastExpression) GetExpressions
+        (
+            this Type objType,
+            string propertyName,
+            Type propItemType)
+        {
+            return objType.GetExpressions<object>(propertyName, propItemType);
+        }
 
-        public static Action<object, object> GetUntypedCSPropertySetterByObjType
+        static DoubleParamMap<Type, string, object> _untypedSettersCache =
+            new DoubleParamMap<Type, string, object>();
+
+        public static Action<object, TValue> GetUntypedCSPropertySetterByObjType<TValue>
         (
             this Type objType,
             string propertyName
         )
         {
-            Action<object, object> result;
+            object resultObj;
 
-            if (_untypedSettersCache.TryGetValue(objType, propertyName, out result))
+            if (_untypedSettersCache.TryGetValue(objType, propertyName, out resultObj))
             {
-                return result;
+                return (Action<object, TValue>)resultObj;
             }
             Type propertyType = objType.GetPropType(propertyName);
 
             (ParameterExpression objParamExpression,
                 ParameterExpression valueParamExpression,
                 MemberExpression propertyExpression,
-                UnaryExpression valueCastExpression) = objType.GetExpressions(propertyName, propertyType);
+                UnaryExpression valueCastExpression)
+                        = 
+                        objType.GetExpressions<TValue>(propertyName, propertyType);
 
-            BinaryExpression assignExpression = Expression.Assign(propertyExpression, valueCastExpression);
+            BinaryExpression assignExpression = 
+                Expression.Assign(propertyExpression, valueCastExpression);
 
-            result = Expression.Lambda<Action<object, object>>
+            var uncompiledResult = Expression.Lambda<Action<object, TValue>>
             (
                  assignExpression,
                  objParamExpression,
                  valueParamExpression
-            ).Compile();
+            );
+
+            Action<object, TValue> result = uncompiledResult.Compile();
 
             _untypedSettersCache.AddKeyValue(objType, propertyName, result);
+
+            return result;
+        }
+
+        public static Action<object, object> GetUntypedCSPropertySetterByObjType
+        (
+            this Type objType,
+            string propertyName
+        ) => objType.GetUntypedCSPropertySetterByObjType<object>(propertyName);
+
+
+        static DoubleParamMap<Type, string, object> _typedPropSettersCache =
+            new DoubleParamMap<Type, string, object>();
+
+        public static Action<object, TProp> GetCSTypedPropertySetterByObjType<TProp>
+        (
+            this Type objType,
+            string propertyName
+        )
+        {
+            object resultObj;
+
+            if (_typedPropSettersCache.TryGetValue(objType, propertyName, out resultObj))
+            {
+                return (Action<object, TProp>)resultObj;
+            }
+            Type propertyType = objType.GetPropType(propertyName);
+
+            (
+                ParameterExpression objParamExpression,
+                ParameterExpression valueParamExpression,
+                MemberExpression propertyExpression,
+                UnaryExpression valueCastExpression)
+                        =
+                        objType.GetExpressions(propertyName, propertyType);
+
+            BinaryExpression assignExpression =
+                Expression.Assign(propertyExpression, valueCastExpression);
+
+            var uncompiledResult = Expression.Lambda<Action<object, TProp>>
+            (
+                 assignExpression,
+                 objParamExpression,
+                 valueParamExpression
+            );
+
+            Action<object, TProp> result = uncompiledResult.Compile();
+
+            _typedPropSettersCache.AddKeyValue(objType, propertyName, result);
 
             return result;
         }
@@ -222,8 +306,7 @@ namespace NP.Utilities.Expressions
                         _untypedCollectionRemoversCacher);
         }
 
-
-        public static Action<object, object> GetUntypedCSPropertySetter
+        public static Action<object, TValue> GetUntypedCSPropertySetter<TValue>
         (
             object obj,
             string propertyName
@@ -232,8 +315,14 @@ namespace NP.Utilities.Expressions
             if (obj == null)
                 return null;
 
-            return GetUntypedCSPropertySetterByObjType(obj.GetType(), propertyName);
+            return GetUntypedCSPropertySetterByObjType<TValue>(obj.GetType(), propertyName);
         }
+
+        public static Action<object, object> GetUntypedCSPropertySetter
+        (
+            object obj,
+            string propertyName
+        ) => GetUntypedCSPropertySetter<object>(obj, propertyName);
 
 
         public static Action<object, object> GetUntypedVoidSingleArgMethodByObjType
@@ -242,11 +331,11 @@ namespace NP.Utilities.Expressions
             string methodName
         )
         {
-            Action<object, object> result;
+            object resultObj;
 
-            if (_untypedSettersCache.TryGetValue(objType, methodName, out result))
+            if (_untypedSettersCache.TryGetValue(objType, methodName, out resultObj))
             {
-                return result;
+                return (Action<object, object>) resultObj;
             }
 
             Type methodArgType = objType.GetMethodArgType(methodName);
@@ -255,12 +344,15 @@ namespace NP.Utilities.Expressions
 
             UnaryExpression objCastExpression = Expression.Convert(objParamExpression, objType);
 
-            ParameterExpression valueParamExpression = Expression.Parameter(typeof(object));
-            UnaryExpression valueCastExpression = Expression.Convert(valueParamExpression, methodArgType);
+            ParameterExpression valueParamExpression = 
+                Expression.Parameter(typeof(object));
+            UnaryExpression valueCastExpression = 
+                Expression.Convert(valueParamExpression, methodArgType);
 
-            MethodCallExpression methodExpression = Expression.Call(objCastExpression, methodName, null, valueCastExpression);
+            MethodCallExpression methodExpression = 
+                Expression.Call(objCastExpression, methodName, null, valueCastExpression);
 
-            result = Expression.Lambda<Action<object, object>>
+            Action<object, object> result = Expression.Lambda<Action<object, object>>
             (
                  methodExpression,
                  objParamExpression,
