@@ -5,17 +5,16 @@ namespace NP.Utilities.Attributes
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class TileActionAttribute : Attribute
     {
-        public string? Name { get; private set; }
-
-        public string[] DependentResults { get; private set; }
+        public string[] DependsOnProps { get; }
+        public string[] DependentResults { get; }
 
         public TileActionAttribute
         (
-            string? name = null,
+            string[] dependsOnProps,
             params string[] dependentResults    
         )
         {
-            Name = name;
+            DependsOnProps = dependsOnProps;
             DependentResults = dependentResults;
         }
     }

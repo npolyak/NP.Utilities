@@ -554,14 +554,15 @@ namespace NP.Utilities.Expressions
                 instanceExpression = Expression.Constant(obj);
             }
 
-            MethodCallExpression methodCallExpr = Expression.Call(instanceExpression, methodInfo, paramSetters);
+            MethodCallExpression methodCallExpr = 
+                Expression.Call(instanceExpression, methodInfo, paramSetters);
 
             return methodCallExpr;
         }
 
         /// <summary>
         /// returns an Action&lt;object[]&gt; to call a void method specified by 
-        /// MethodInfo. If this method is not static, you should also provice 
+        /// MethodInfo. If this method is not static, you should also provide 
         /// the object info as obj argument
         /// </summary>
         /// <param name="methodInfo"></param>
@@ -585,7 +586,7 @@ namespace NP.Utilities.Expressions
 
         /// <summary>
         /// returns an Func&lt;object[], object&gt; to call a NON-VOID method specified by 
-        /// MethodInfo. If this method is not static, you should also provice 
+        /// MethodInfo. If this method is not static, you should also provide 
         /// the object info as obj argument
         /// </summary>
         /// <param name="methodInfo"></param>
