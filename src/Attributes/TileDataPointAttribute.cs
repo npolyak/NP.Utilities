@@ -18,6 +18,5 @@ namespace NP.Utilities.Attributes
 
         public string? ChangedByActionName { get; init; } = null;
 
-
     }
 }

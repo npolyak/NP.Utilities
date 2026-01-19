@@ -73,7 +73,7 @@ namespace NP.Utilities
                 return sourceValue;
             }
             else if (sourceValue is IConvertible convertible &&
-                typeof(IConvertible).IsAssignableFrom(resultType))
+                        typeof(IConvertible).IsAssignableFrom(resultType))
             {
                 return convertible.ToType(resultType, null);
             }
@@ -84,7 +84,8 @@ namespace NP.Utilities
                 if (resultType.IsAbstract)
                 {
                     TypeConverterAttribute attr =
-                        resultType.GetCustomAttributes(typeof(TypeConverterAttribute), false).FirstOrDefault() as TypeConverterAttribute;
+                        resultType.GetCustomAttributes(typeof(TypeConverterAttribute), false)
+                                  .FirstOrDefault() as TypeConverterAttribute;
 
                     if (attr != null)
                     {
