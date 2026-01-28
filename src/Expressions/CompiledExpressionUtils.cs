@@ -315,7 +315,11 @@ namespace NP.Utilities.Expressions
             if (obj == null)
                 return null;
 
-            return GetUntypedCSPropertySetterByObjType<TValue>(obj.GetType(), propertyName);
+            return 
+                GetUntypedCSPropertySetterByObjType<TValue>
+                (
+                    obj.GetType(), 
+                    propertyName);
         }
 
         public static Action<object, object> GetUntypedCSPropertySetter
