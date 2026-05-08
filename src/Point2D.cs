@@ -21,10 +21,10 @@ namespace NP.Utilities
         where T : IComparable<T>
     {
         [XmlAttribute]
-        public T X { get; }
+        public T X { get; init; }
 
         [XmlAttribute]
-        public T Y { get; }
+        public T Y { get; init; }
 
         public Point2D()
         {
