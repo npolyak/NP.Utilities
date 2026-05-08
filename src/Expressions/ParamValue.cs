@@ -19,7 +19,8 @@ namespace NP.Utilities.Expressions
 
         public ParameterExpression _outputArrayParams;
 
-        public Expression? InputParamExpression => (InputArrayAccessConvertExpr ?? Expr);
+        public Expression? InputParamExpression => 
+                (InputArrayAccessConvertExpr ?? Expr);
 
 
         public object? Value { get; set; }
@@ -96,7 +97,10 @@ namespace NP.Utilities.Expressions
 
 
                 var inputArrayAccessConvExpr =
-                    Expression.Convert(_inputArrayParam.CreateArrayCellAccessExpression(InputIdx), this.RealType);
+                    Expression.Convert
+                    (
+                        _inputArrayParam.CreateArrayCellAccessExpression(InputIdx),
+                        this.RealType);
 
                 if (IsOut)
                 {
@@ -120,10 +124,15 @@ namespace NP.Utilities.Expressions
             {
                 _outputIdx = value;
 
-                var outputArrayAccessExpr = _outputArrayParams.CreateArrayCellAccessExpression(_outputIdx);
+                var outputArrayAccessExpr = 
+                    _outputArrayParams.CreateArrayCellAccessExpression(_outputIdx);
 
                 ///e.g. $__Output__[0] = (System.Object)$referenceInt
-                AssignOutputValueExpression = Expression.Assign(outputArrayAccessExpr, Expression.Convert(Expr, typeof(object)));
+                AssignOutputValueExpression = 
+                    Expression.Assign
+                    (
+                        outputArrayAccessExpr, 
+                        Expression.Convert(Expr, typeof(object)));
             }
         }
 

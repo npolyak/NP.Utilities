@@ -9,11 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 //
-using NP.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 
 namespace NP.Utilities
 {

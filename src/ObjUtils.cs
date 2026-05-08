@@ -9,11 +9,8 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace NP.Utilities
 {
@@ -75,6 +72,11 @@ namespace NP.Utilities
             {
                 return sourceValue;
             }
+            else if (sourceValue is IConvertible convertible &&
+                        typeof(IConvertible).IsAssignableFrom(resultType))
+            {
+                return convertible.ToType(resultType, null);
+            }
             else
             {
                 TypeConverter typeConverter = null;
@@ -82,7 +84,8 @@ namespace NP.Utilities
                 if (resultType.IsAbstract)
                 {
                     TypeConverterAttribute attr =
-                        resultType.GetCustomAttributes(typeof(TypeConverterAttribute), false).FirstOrDefault() as TypeConverterAttribute;
+                        resultType.GetCustomAttributes(typeof(TypeConverterAttribute), false)
+                                  .FirstOrDefault() as TypeConverterAttribute;
 
                     if (attr != null)
                     {
@@ -94,7 +97,8 @@ namespace NP.Utilities
 
                             if (typeConverterType != null)
                             {
-                                typeConverter = Activator.CreateInstance(typeConverterType) as TypeConverter;
+                                typeConverter =
+                                    Activator.CreateInstance(typeConverterType) as TypeConverter;
                             }
                         }
                     }
@@ -135,7 +139,7 @@ namespace NP.Utilities
                             {
                                 return null;
                             }
-                            
+
                             foreach (string strItem in strItems)
                             {
                                 resultList.Add(collectionCellType.ConvertToType(strItem));

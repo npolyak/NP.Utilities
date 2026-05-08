@@ -219,7 +219,6 @@ namespace NP.Utilities
             return str;
         }
 
-
         public static bool IsCollection(this Type type)
         {
             return (type != null) && typeof(IEnumerable).IsAssignableFrom(type);
