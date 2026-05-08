@@ -19,8 +19,8 @@ namespace NP.Utilities
     public class Rect2D<T>
         where T : INumber<T>
     {
-        public Point2D<T> StartPoint { get; } = new Point2D<T>();
-        public Point2D<T> EndPoint { get; } = new Point2D<T>();
+        public Point2D<T> StartPoint { get; init; } = new Point2D<T>();
+        public Point2D<T> EndPoint { get; init; } = new Point2D<T>();
 
         public T Width =>
             EndPoint.X - StartPoint.X;

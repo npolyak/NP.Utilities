@@ -10,6 +10,12 @@ namespace NP.Utilities
 
     public static class SegmentUtils
     {
+        public static Segment1D<T> CreateByLength<T>(T start, T length)
+            where T : notnull, INumber<T>
+        {
+            return new Segment1D<T>(start, start + length);
+        }
+
         public static bool Contains<T>(this Segment1D<T> segment, T position)
             where T : notnull, INumber<T>
         {
