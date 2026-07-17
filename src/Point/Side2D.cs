@@ -1,6 +1,6 @@
-﻿using static NP.Utilities.Side2D;
+﻿using static NP.Utilities.Point.Side2D;
 
-namespace NP.Utilities;
+namespace NP.Utilities.Point;
 
 public enum Side2D
 {
@@ -18,6 +18,8 @@ public static class Side2DUtils
     public static bool IsY(this Side2D side) => side is Top or Bottom;
 
     public static bool IsStart(this Side2D side) => side is Left or Top;
+
+    public static bool IsEnd(this Side2D side) => side is Right or Bottom;
 
     public static Side2D GetSide2D(this Side1D side, bool horizontalOrVertical)
     {

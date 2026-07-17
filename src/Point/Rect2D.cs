@@ -1,0 +1,248 @@
+﻿// (c) Nick Polyak 2021 - http://awebpros.com/
+// License: MIT License (https://opensource.org/licenses/MIT)
+//
+// short overview of copyright rules:
+// 1. you can use this framework in any commercial or non-commercial 
+//    product as long as you retain this copyright message
+// 2. Do not blame the author of this software if something goes wrong. 
+// 
+// Also, please, mention this software in any documentation for the 
+// products that use it.
+//
+global using Rect2D = NP.Utilities.Point.Rect2D<double>;
+using System.Numerics;
+
+using static NP.Utilities.Point.Side2D;
+
+namespace NP.Utilities.Point;
+
+public class Rect2D<T>
+    where T : INumber<T>
+{
+    public IPoint2D<T> StartPoint { get; init; } = new Point2D<T>();
+    public IPoint2D<T> EndPoint { get; init; } = new Point2D<T>();
+
+    public T Width =>
+        EndPoint.X - StartPoint.X;
+
+    public T Height =>
+        EndPoint.Y - StartPoint.Y;
+
+    public Segment1D<T> HorizontalStartEnd =>
+        new Segment1D<T>(StartPoint.X, EndPoint.X);
+
+    public Segment1D<T> VerticalStartEnd =>
+        new Segment1D<T>(StartPoint.Y, EndPoint.Y);
+
+    public Rect2D()
+    {
+
+    }
+
+    public Rect2D(IPoint2D<T> startPoint, IPoint2D<T> endPoint)
+    {
+        this.StartPoint = startPoint;
+        this.EndPoint = endPoint;
+    }
+
+    public Rect2D(T startX, T startY, T width, T height) :
+        this(new Point2D<T>(startX, startY), new Point2D<T>(startX + width, startY + height))
+    {
+
+    }
+
+    public override string ToString()
+    {
+        return $"{{{StartPoint}, {EndPoint}}}";
+    }
+
+    public static ComparablePoint2D Parse(string s)
+    {
+        return null;
+    }
+
+    public Rect2D<T> Shift(Point2D<T> point)
+    {
+        return new Rect2D<T>(this.StartPoint + point, EndPoint + point);
+    }
+}
+
+public static class Rect2DUtils
+{
+    public static (Rect2D<T> rect, IPoint2D<T> rectPt1, IPoint2D<T> rectPt2) ToRectAndPointsWithin<T>(this IPoint2D<T> pt1, IPoint2D<T> pt2)
+        where T : INumber<T>
+    {
+        if ((pt1 == null) || (pt2 == null))
+            return (null, null, null);
+
+        IPoint2D<T> startPoint = pt1.Min(pt2);
+        IPoint2D<T> endPoint = pt1.Max(pt2);
+
+        Rect2D<T> rect = new Rect2D<T>(startPoint, endPoint);
+
+        return (rect, pt1.Minus(startPoint), pt2.Minus(startPoint));
+    }
+
+    public static bool ContainsPoint<T>(this Rect2D<T> rect, ComparablePoint2D<T> pt)
+        where T : INumber<T>
+    {
+        return pt.GreaterOrEqual(rect.StartPoint).All &&
+            pt.LessOrEqual(rect.EndPoint).All;
+    }
+
+    public static IPoint2D<T> GetSize<T>(this Rect2D<T> rect, T scale)
+        where T : INumber<T>
+    {
+        return new Point2D<T>(rect.Width * scale, rect.Height * scale);
+    }
+
+    public static IPoint2D<T> GetSize<T>(this Rect2D<T> rect)
+        where T : INumber<T>
+    {
+        return rect.GetSize(T.One);
+    }
+
+    public static Rect2D<T> ScaleWidth<T>(this Rect2D<T> rect, T scaleFactor, bool fromStart = true)
+        where T : INumber<T>
+    {
+        T width = rect.GetSize().ScaleX(scaleFactor).X;
+
+        if (fromStart)
+        {
+            IPoint2D<T> endPoint = new Point2D<T>(rect.StartPoint.X + width, rect.EndPoint.Y);
+
+            var result = new Rect2D<T>(rect.StartPoint, endPoint);
+            return result;
+        }
+        else // from end
+        {
+            IPoint2D<T> startPoint = new Point2D<T>(rect.EndPoint.X - width, rect.StartPoint.Y);
+
+            var result = new Rect2D<T>(startPoint, rect.EndPoint);
+
+            return result;
+        }
+    }
+
+    public static Rect2D<T> ScaleHeight<T>(this Rect2D<T> rect, T scaleFactor, bool fromStart = true)
+        where T : INumber<T>
+    {
+        T height = rect.GetSize().ScaleY(scaleFactor).Y;
+
+        if (fromStart)
+        {
+            IPoint2D<T> endPoint = new Point2D<T>(rect.EndPoint.X, rect.StartPoint.Y + height);
+
+            return new Rect2D<T>(rect.StartPoint, endPoint);
+        }
+        else // from end
+        {
+            IPoint2D<T> startPoint = new Point2D<T>(rect.StartPoint.X, rect.EndPoint.Y - height);
+
+            return new Rect2D<T>(startPoint, rect.EndPoint);
+        }
+    }
+
+
+    public static Rect2D<T> ScaleToSide<T>(this Rect2D<T> rect, T scale, Side2D sideToScaleTo)
+        where T : INumber<T>
+    {
+        if (sideToScaleTo == Side2D.Center)
+            return rect;
+
+        bool fromStart = sideToScaleTo.IsStart();
+
+        var result = sideToScaleTo.IsX() ? rect.ScaleWidth(scale, fromStart) : rect.ScaleHeight(scale, fromStart);
+
+        return result;
+    }
+
+
+    public static Side2D GetSide(this Rect2D rect, ComparablePoint2D position)
+    {
+        if (!rect.ContainsPoint(position))
+            return Side2D.Center; // default
+
+        Side1D horizontalNearestSide = Side1D.Center, verticalNearestSide = Side1D.Center;
+        double relativePositionToNearestHorizontalSide, relativePositionToNearestVerticalSide;
+
+        (horizontalNearestSide, relativePositionToNearestHorizontalSide) = rect.HorizontalStartEnd.GetNearestSideAndRelativePosition(position.X);
+        (verticalNearestSide, relativePositionToNearestVerticalSide) = rect.VerticalStartEnd.GetNearestSideAndRelativePosition(position.Y);
+
+        if (relativePositionToNearestHorizontalSide <= relativePositionToNearestVerticalSide)
+        {
+            if (relativePositionToNearestHorizontalSide < 0.25)
+                return horizontalNearestSide.GetSide2D(true);
+        }
+        else
+        {
+            if (relativePositionToNearestVerticalSide < 0.25)
+                return verticalNearestSide.GetSide2D(false);
+        }
+
+        return Side2D.Center;
+    }
+
+    public static Rect2D<T> CreateRectFromSize<T>(this IPoint2D<T> size)
+        where T : notnull, INumber<T>
+    {
+        return new Rect2D<T>(new Point2D<T>(), new Point2D<T>(size.X, size.Y));
+    }
+
+    public static ComparablePoint2D<T> LocationWithinBoundaries<T>(this Rect2D<T> rect, IPoint2D<T> position)
+        where T : notnull, INumber<T>
+    {
+        return new ComparablePoint2D<T>
+            (
+                rect.HorizontalStartEnd.LocationWithinBoundaries(position.X), 
+                rect.VerticalStartEnd.LocationWithinBoundaries(position.Y)
+            );
+    }
+
+
+    public static (IPoint2D<T> boundPosition, IPoint2D<T> delta)
+        FitPointToRectangle<T>
+        (
+            this Rect2D<T> borderRect, 
+            Point2D<T> originalPosition
+        )
+        where T : notnull, INumber<T>
+    {
+        var horizontalBorderSegment = borderRect.HorizontalStartEnd;
+
+        (T horizontalBoundPosition, T horizontalDelta) = 
+            horizontalBorderSegment.FitPointToSegment(originalPosition.X);
+
+        (T verticalBoundPosition, T verticalDelta)   = 
+            borderRect.VerticalStartEnd.FitPointToSegment(originalPosition.Y);
+
+        return             
+            (
+                new Point2D<T>(horizontalBoundPosition, verticalBoundPosition),
+                new Point2D<T>(horizontalDelta, verticalDelta)
+            );
+    }
+
+    public static (IPoint2D<T> boundPosition, IPoint2D<T> delta)
+    FitRectangleToRectangle<T>
+    (
+        this Rect2D<T> borderRect,
+        Rect2D<T> rectToPlaceInside
+    )
+    where T : notnull, INumber<T>
+    {
+        var horizontalBorderSegment = borderRect.HorizontalStartEnd;
+
+        (T horizontalBoundPosition, T horizontalDelta) =
+            borderRect.HorizontalStartEnd.FitSegmentToSegment(rectToPlaceInside.HorizontalStartEnd);
+
+        (T verticalBoundPosition, T verticalDelta) =
+            borderRect.VerticalStartEnd.FitSegmentToSegment(rectToPlaceInside.VerticalStartEnd);
+
+        return
+            (
+                new Point2D<T>(horizontalBoundPosition, verticalBoundPosition),
+                new Point2D<T>(horizontalDelta, verticalDelta)
+            );
+    }
+}

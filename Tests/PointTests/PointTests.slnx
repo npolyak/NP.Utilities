@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="../../src/NP.Utilities.csproj" />
+  </Folder>
+  <Project Path="PointTests.csproj" />
+</Solution>
